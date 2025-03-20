@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+CAUTION: Do not modify this file unless you know what you are doing.
+ Unexpected results may occur if the code is changed deliberately.
+-->
+<dbmodel pgmodeler-ver="1.1.6" use-changelog="false" max-obj-count="6"
+	 last-position="0,0" last-zoom="0.8"
+	 default-schema="public" default-owner="postgres"
+	 layers="Default layer"
+	 active-layers="0"
+	 layer-name-colors="#000000"
+	 layer-rect-colors="#b4b4b4"
+	 show-layer-names="false" show-layer-rects="false">
+<database name="Battle" is-template="false" allow-conns="true">
+</database>
+
+<schema name="public" layers="0" fill-color="#e1e1e1" name-color="#000000" sql-disabled="true">
+</schema>
+
+<table name="Player" layers="0" collapse-mode="2" max-obj-count="3" z-value="0">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="100" y="200"/>
+	<column name="Id" not-null="true">
+		<type name="uuid" length="0"/>
+	</column>
+	<column name="Name" not-null="true">
+		<type name="character varying" length="255"/>
+	</column>
+	<column name="Rank">
+		<type name="integer" length="0"/>
+	</column>
+	<constraint name="Player_pk" type="pk-constr" table="public.&quot;Player&quot;">
+		<columns names="Id" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<table name="Battle" layers="0" collapse-mode="2" max-obj-count="9" z-value="0">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="580" y="520"/>
+	<column name="Id" not-null="true">
+		<type name="varchar" length="100"/>
+	</column>
+	<column name="GameVersion" not-null="true">
+		<type name="varchar" length="20"/>
+	</column>
+	<column name="Timestamp" not-null="true">
+		<type name="timestamp" length="0"/>
+	</column>
+	<column name="Player1Id" not-null="true">
+		<type name="uuid" length="0"/>
+	</column>
+	<column name="Player2Id" not-null="true">
+		<type name="uuid" length="0"/>
+	</column>
+	<column name="Player1CharacterId" not-null="true">
+		<type name="integer" length="0"/>
+	</column>
+	<column name="Player2CharacterId" not-null="true">
+		<type name="integer" length="0"/>
+	</column>
+	<column name="StageId" not-null="true">
+		<type name="integer" length="0"/>
+	</column>
+	<constraint name="NotSamePlayer" type="ck-constr" table="public.&quot;Battle&quot;">
+			<expression> <![CDATA[Player1Id  !== Player2Id]]> </expression>
+	</constraint>
+	<constraint name="Battle_pk" type="pk-constr" table="public.&quot;Battle&quot;">
+		<columns names="Id" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<table name="Character" layers="0" collapse-mode="2" max-obj-count="3" z-value="0">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="1180" y="440"/>
+	<column name="Id" not-null="true">
+		<type name="integer" length="0"/>
+	</column>
+	<column name="Abbreviation" not-null="true">
+		<type name="varchar" length="3"/>
+	</column>
+	<column name="Name" not-null="true">
+		<type name="varchar" length="30"/>
+	</column>
+	<constraint name="Character_pk" type="pk-constr" table="public.&quot;Character&quot;">
+		<columns names="Id" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<table name="Stage" layers="0" collapse-mode="2" max-obj-count="2" z-value="0">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="680" y="100"/>
+	<column name="Id" not-null="true">
+		<type name="integer" length="0"/>
+	</column>
+	<column name="Name" not-null="true">
+		<type name="character varying" length="50"/>
+	</column>
+	<constraint name="Stage_pk" type="pk-constr" table="public.&quot;Stage&quot;">
+		<columns names="Id" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<constraint name="player1FK" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="public.&quot;Player&quot;" table="public.&quot;Battle&quot;">
+	<columns names="Player1Id" ref-type="src-columns"/>
+	<columns names="Id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="player2FK" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="public.&quot;Player&quot;" table="public.&quot;Battle&quot;">
+	<columns names="Player2Id" ref-type="src-columns"/>
+	<columns names="Id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="player1CharacterFK" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="public.&quot;Character&quot;" table="public.&quot;Battle&quot;">
+	<columns names="Player1CharacterId" ref-type="src-columns"/>
+	<columns names="Id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="plaer2CharacterFK" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="public.&quot;Character&quot;" table="public.&quot;Battle&quot;">
+	<columns names="Player2CharacterId" ref-type="src-columns"/>
+	<columns names="Id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="stageFK" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="public.&quot;Stage&quot;" table="public.&quot;Battle&quot;">
+	<columns names="Id" ref-type="src-columns"/>
+	<columns names="Id" ref-type="dst-columns"/>
+</constraint>
+
+<relationship name="&quot;rel_Battle_Player&quot;" type="relfk" layers="0"
+	 src-table="public.&quot;Battle&quot;"
+	 dst-table="public.&quot;Player&quot;" reference-fk="player1FK"
+	 src-required="false" dst-required="true"/>
+
+<relationship name="&quot;rel_Battle_Player1&quot;" type="relfk" layers="0"
+	 src-table="public.&quot;Battle&quot;"
+	 dst-table="public.&quot;Player&quot;" reference-fk="player2FK"
+	 src-required="false" dst-required="true"/>
+
+<relationship name="rel_Battle_Character" type="relfk" layers="0"
+	 src-table="public.&quot;Battle&quot;"
+	 dst-table="public.&quot;Character&quot;" reference-fk="player1CharacterFK"
+	 src-required="false" dst-required="true">
+	<label ref-type="name-label">
+		<position x="165.023" y="-3.88285"/>
+	</label>
+</relationship>
+
+<relationship name="rel_Battle_Character1" type="relfk" layers="0"
+	 src-table="public.&quot;Battle&quot;"
+	 dst-table="public.&quot;Character&quot;" reference-fk="plaer2CharacterFK"
+	 src-required="false" dst-required="true">
+	<label ref-type="name-label">
+		<position x="-22.6483" y="-89.3864"/>
+	</label>
+</relationship>
+
+<relationship name="&quot;rel_Battle_Stage&quot;" type="relfk" layers="0"
+	 src-table="public.&quot;Battle&quot;"
+	 dst-table="public.&quot;Stage&quot;" reference-fk="stageFK"
+	 src-required="false" dst-required="true"/>
+
+</dbmodel>
