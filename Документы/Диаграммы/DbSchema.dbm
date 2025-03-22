@@ -3,31 +3,34 @@
 CAUTION: Do not modify this file unless you know what you are doing.
  Unexpected results may occur if the code is changed deliberately.
 -->
-<dbmodel pgmodeler-ver="1.1.6" use-changelog="false" max-obj-count="6"
-	 last-position="0,0" last-zoom="0.8"
+<dbmodel pgmodeler-ver="1.1.6" use-changelog="false" max-obj-count="9"
+	 last-position="0,0" last-zoom="0.8" scene-rect="0,0,1604.43,1120.92"
 	 default-schema="public" default-owner="postgres"
 	 layers="Default layer"
 	 active-layers="0"
 	 layer-name-colors="#000000"
 	 layer-rect-colors="#b4b4b4"
 	 show-layer-names="false" show-layer-rects="false">
-<database name="Battle" is-template="false" allow-conns="true">
+<database name="CharacterStats" is-template="false" allow-conns="true">
 </database>
 
 <schema name="public" layers="0" fill-color="#e1e1e1" name-color="#000000" sql-disabled="true">
 </schema>
 
-<table name="Player" layers="0" collapse-mode="2" max-obj-count="3" z-value="0">
+<table name="Player" layers="0" collapse-mode="2" max-obj-count="4" z-value="0">
 	<schema name="public"/>
 	<role name="postgres"/>
-	<position x="100" y="200"/>
+	<position x="200" y="480"/>
 	<column name="Id" not-null="true">
 		<type name="uuid" length="0"/>
 	</column>
 	<column name="Name" not-null="true">
 		<type name="character varying" length="255"/>
 	</column>
-	<column name="Rank">
+	<column name="WinCount" not-null="true">
+		<type name="integer" length="0"/>
+	</column>
+	<column name="LossCount" not-null="true">
 		<type name="integer" length="0"/>
 	</column>
 	<constraint name="Player_pk" type="pk-constr" table="public.&quot;Player&quot;">
@@ -38,7 +41,7 @@ CAUTION: Do not modify this file unless you know what you are doing.
 <table name="Battle" layers="0" collapse-mode="2" max-obj-count="9" z-value="0">
 	<schema name="public"/>
 	<role name="postgres"/>
-	<position x="580" y="520"/>
+	<position x="1200" y="720"/>
 	<column name="Id" not-null="true">
 		<type name="varchar" length="100"/>
 	</column>
@@ -74,7 +77,7 @@ CAUTION: Do not modify this file unless you know what you are doing.
 <table name="Character" layers="0" collapse-mode="2" max-obj-count="3" z-value="0">
 	<schema name="public"/>
 	<role name="postgres"/>
-	<position x="1180" y="440"/>
+	<position x="880" y="420"/>
 	<column name="Id" not-null="true">
 		<type name="integer" length="0"/>
 	</column>
@@ -92,7 +95,7 @@ CAUTION: Do not modify this file unless you know what you are doing.
 <table name="Stage" layers="0" collapse-mode="2" max-obj-count="2" z-value="0">
 	<schema name="public"/>
 	<role name="postgres"/>
-	<position x="680" y="100"/>
+	<position x="1240" y="320"/>
 	<column name="Id" not-null="true">
 		<type name="integer" length="0"/>
 	</column>
@@ -102,6 +105,52 @@ CAUTION: Do not modify this file unless you know what you are doing.
 	<constraint name="Stage_pk" type="pk-constr" table="public.&quot;Stage&quot;">
 		<columns names="Id" ref-type="src-columns"/>
 	</constraint>
+</table>
+
+<table name="Names" layers="0" collapse-mode="2" max-obj-count="4" z-value="0">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="220" y="40"/>
+	<column name="Id" not-null="true"
+	 identity-type="ALWAYS">
+		<type name="integer" length="0"/>
+	</column>
+	<column name="Name" not-null="true">
+		<type name="varchar" length="255"/>
+	</column>
+	<column name="Date" not-null="true">
+		<type name="date" length="0"/>
+	</column>
+	<column name="PlayerId" not-null="true">
+		<type name="uuid" length="0"/>
+	</column>
+	<constraint name="Names_pk" type="pk-constr" table="public.&quot;Names&quot;">
+		<columns names="Id" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<table name="CharacterStats" layers="0" collapse-mode="2" max-obj-count="7" z-value="0">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="660" y="60"/>
+	<column name="CharacterId" not-null="true">
+		<type name="integer" length="0"/>
+	</column>
+	<column name="PlayerId" not-null="true">
+		<type name="uuid" length="0"/>
+	</column>
+	<column name="WinCount" not-null="true">
+		<type name="integer" length="0"/>
+	</column>
+	<column name="LossCount" not-null="true">
+		<type name="integer" length="0"/>
+	</column>
+	<column name="LastPlayed" not-null="true">
+		<type name="date" length="0"/>
+	</column>
+	<column name="Rating" not-null="true">
+		<type name="integer" length="0"/>
+	</column>
 </table>
 
 <constraint name="player1FK" type="fk-constr" comparison-type="MATCH SIMPLE"
@@ -134,15 +183,41 @@ CAUTION: Do not modify this file unless you know what you are doing.
 	<columns names="Id" ref-type="dst-columns"/>
 </constraint>
 
-<relationship name="&quot;rel_Battle_Player&quot;" type="relfk" layers="0"
+<constraint name="Playe_FK" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="public.&quot;Player&quot;" table="public.&quot;Names&quot;">
+	<columns names="PlayerId" ref-type="src-columns"/>
+	<columns names="Id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="Character_FK" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="public.&quot;Character&quot;" table="public.&quot;CharacterStats&quot;">
+	<columns names="CharacterId" ref-type="src-columns"/>
+	<columns names="Id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="Player_FK" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="public.&quot;Player&quot;" table="public.&quot;CharacterStats&quot;">
+	<columns names="PlayerId" ref-type="src-columns"/>
+	<columns names="Id" ref-type="dst-columns"/>
+</constraint>
+
+<relationship name="rel_Battle_Player" type="relfk" layers="0"
 	 src-table="public.&quot;Battle&quot;"
 	 dst-table="public.&quot;Player&quot;" reference-fk="player1FK"
-	 src-required="false" dst-required="true"/>
+	 src-required="false" dst-required="true">
+	<label ref-type="name-label">
+		<position x="53.1924" y="-22.6815"/>
+	</label>
+</relationship>
 
-<relationship name="&quot;rel_Battle_Player1&quot;" type="relfk" layers="0"
+<relationship name="rel_Battle_Player1" type="relfk" layers="0"
 	 src-table="public.&quot;Battle&quot;"
 	 dst-table="public.&quot;Player&quot;" reference-fk="player2FK"
-	 src-required="false" dst-required="true"/>
+	 src-required="false" dst-required="true">
+	<label ref-type="name-label">
+		<position x="56.6924" y="10.9978"/>
+	</label>
+</relationship>
 
 <relationship name="rel_Battle_Character" type="relfk" layers="0"
 	 src-table="public.&quot;Battle&quot;"
@@ -165,6 +240,25 @@ CAUTION: Do not modify this file unless you know what you are doing.
 <relationship name="&quot;rel_Battle_Stage&quot;" type="relfk" layers="0"
 	 src-table="public.&quot;Battle&quot;"
 	 dst-table="public.&quot;Stage&quot;" reference-fk="stageFK"
+	 src-required="false" dst-required="true"/>
+
+<relationship name="&quot;rel_Names_Player&quot;" type="relfk" layers="0"
+	 src-table="public.&quot;Names&quot;"
+	 dst-table="public.&quot;Player&quot;" reference-fk="Playe_FK"
+	 src-required="false" dst-required="true"/>
+
+<relationship name="rel_CharacterStats_Character" type="relfk" layers="0"
+	 src-table="public.&quot;CharacterStats&quot;"
+	 dst-table="public.&quot;Character&quot;" reference-fk="Character_FK"
+	 src-required="false" dst-required="true">
+	<label ref-type="name-label">
+		<position x="202.528" y="14.747"/>
+	</label>
+</relationship>
+
+<relationship name="&quot;rel_CharacterStats_Player&quot;" type="relfk" layers="0"
+	 src-table="public.&quot;CharacterStats&quot;"
+	 dst-table="public.&quot;Player&quot;" reference-fk="Player_FK"
 	 src-required="false" dst-required="true"/>
 
 </dbmodel>
