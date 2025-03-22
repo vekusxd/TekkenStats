@@ -1,4 +1,4 @@
-﻿namespace TekkenStats.API.Data.Models;
+﻿namespace TekkenStats.Core.Models;
 
 public class CharacterInfo
 {

@@ -2,6 +2,14 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TekkenStats.API", "TekkenStats.API\TekkenStats.API.csproj", "{3C908B10-DD3D-4406-B050-0063F0CEC694}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TekkenStats.DataAccess", "TekkenStats.DataAccess\TekkenStats.DataAccess.csproj", "{6F16D968-5735-46B8-A2D2-1B13ACF17308}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TekkenStats.Core", "TekkenStats.Core\TekkenStats.Core.csproj", "{584476E1-8950-4475-8245-E0149C8736D4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TekkenStats.Seeder", "TekkenStats.Seeder\TekkenStats.Seeder.csproj", "{AAA179E9-1E1F-4C9F-8DB9-98B1CF8C3A30}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TekkenStats.Application", "TekkenStats.Application\TekkenStats.Application.csproj", "{52E9080C-B8A3-4287-8771-EA76A7A1FE49}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +20,21 @@ Global
 		{3C908B10-DD3D-4406-B050-0063F0CEC694}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3C908B10-DD3D-4406-B050-0063F0CEC694}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3C908B10-DD3D-4406-B050-0063F0CEC694}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6F16D968-5735-46B8-A2D2-1B13ACF17308}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6F16D968-5735-46B8-A2D2-1B13ACF17308}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6F16D968-5735-46B8-A2D2-1B13ACF17308}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6F16D968-5735-46B8-A2D2-1B13ACF17308}.Release|Any CPU.Build.0 = Release|Any CPU
+		{584476E1-8950-4475-8245-E0149C8736D4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{584476E1-8950-4475-8245-E0149C8736D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{584476E1-8950-4475-8245-E0149C8736D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{584476E1-8950-4475-8245-E0149C8736D4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AAA179E9-1E1F-4C9F-8DB9-98B1CF8C3A30}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AAA179E9-1E1F-4C9F-8DB9-98B1CF8C3A30}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AAA179E9-1E1F-4C9F-8DB9-98B1CF8C3A30}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AAA179E9-1E1F-4C9F-8DB9-98B1CF8C3A30}.Release|Any CPU.Build.0 = Release|Any CPU
+		{52E9080C-B8A3-4287-8771-EA76A7A1FE49}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{52E9080C-B8A3-4287-8771-EA76A7A1FE49}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{52E9080C-B8A3-4287-8771-EA76A7A1FE49}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{52E9080C-B8A3-4287-8771-EA76A7A1FE49}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

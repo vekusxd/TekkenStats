@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using TekkenStats.API.Data.Models;
+using TekkenStats.Core.Models;
 
-namespace TekkenStats.API.Data.Configurations;
+namespace TekkenStats.DataAccess.Configurations;
 
 public class BattleConfiguration : IEntityTypeConfiguration<Battle>
 {

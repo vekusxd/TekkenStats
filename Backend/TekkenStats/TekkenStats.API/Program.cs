@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
-using TekkenStats.API.Data;
+using TekkenStats.DataAccess;
 
 var builder = WebApplication.CreateBuilder(args);
 
