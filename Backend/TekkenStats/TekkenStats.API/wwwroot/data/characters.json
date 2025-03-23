@@ -1,0 +1,227 @@
+[
+  {
+    "Id": 0,
+    "Name": "Paul",
+    "Abbreviation": "GRF"
+  },
+  {
+    "Id": 1,
+    "Name": "Law",
+    "Abbreviation": "PIG"
+  },
+  {
+    "Id": 2,
+    "Name": "King",
+    "Abbreviation": "PGN"
+  },
+  {
+    "Id": 3,
+    "Name": "Yoshimitsu",
+    "Abbreviation": "CML"
+  },
+  {
+    "Id": 4,
+    "Name": "Hwoarang",
+    "Abbreviation": "SNK"
+  },
+  {
+    "Id": 5,
+    "Name": "Ling Xiaoyu",
+    "Abbreviation": "RAT"
+  },
+  {
+    "Id": 6,
+    "Name": "Jin",
+    "Abbreviation": "ANT"
+  },
+  {
+    "Id": 7,
+    "Name": "Bryan",
+    "Abbreviation": "CHT"
+  },
+  {
+    "Id": 8,
+    "Name": "Kazuya",
+    "Abbreviation": "GRL"
+  },
+  {
+    "Id": 9,
+    "Name": "Steve",
+    "Abbreviation": "BSN"
+  },
+  {
+    "Id": 10,
+    "Name": "Jack-7",
+    "Abbreviation": "CCN"
+  },
+  {
+    "Id": 11,
+    "Name": "Asuka",
+    "Abbreviation": "DER"
+  },
+  {
+    "Id": 12,
+    "Name": "Devil Jin",
+    "Abbreviation": "SWL"
+  },
+  {
+    "Id": 13,
+    "Name": "Feng",
+    "Abbreviation": "KLW"
+  },
+  {
+    "Id": 14,
+    "Name": "Lili",
+    "Abbreviation": "HMS"
+  },
+  {
+    "Id": 15,
+    "Name": "Dragunov",
+    "Abbreviation": "KMD"
+  },
+  {
+    "Id": 16,
+    "Name": "Leo",
+    "Abbreviation": "GHP"
+  },
+  {
+    "Id": 17,
+    "Name": "Lars",
+    "Abbreviation": "LZD"
+  },
+  {
+    "Id": 18,
+    "Name": "Alisa",
+    "Abbreviation": "MNT"
+  },
+  {
+    "Id": 19,
+    "Name": "Claudio",
+    "Abbreviation": "CTR"
+  },
+  {
+    "Id": 20,
+    "Name": "Shaheen",
+    "Abbreviation": "HRS"
+  },
+  {
+    "Id": 21,
+    "Name": "Nina",
+    "Abbreviation": "KAL"
+  },
+  {
+    "Id": 22,
+    "Name": "Lee",
+    "Abbreviation": "WLF"
+  },
+  {
+    "Id": 23,
+    "Name": "Kuma",
+    "Abbreviation": "RBT"
+  },
+  {
+    "Id": 24,
+    "Name": "Panda",
+    "Abbreviation": "TTR"
+  },
+  {
+    "Id": 28,
+    "Name": "Zafina",
+    "Abbreviation": "CRW"
+  },
+  {
+    "Id": 29,
+    "Name": "Leroy",
+    "Abbreviation": "JLY"
+  },
+  {
+    "Id": 27,
+    "Name": "Jun",
+    "Abbreviation": "AML"
+  },
+  {
+    "Id": 33,
+    "Name": "Reina",
+    "Abbreviation": "ZBR"
+  },
+  {
+    "Id": 34,
+    "Name": "Azucena",
+    "Abbreviation": "CAT"
+  },
+  {
+    "Id": 35,
+    "Name": "Victor",
+    "Abbreviation": "LON"
+  },
+  {
+    "Id": 36,
+    "Name": "Raven",
+    "Abbreviation": "BBN"
+  },
+  {
+    "Id": 32,
+    "Name": "Azazel",
+    "Abbreviation": "GOT"
+  },
+  {
+    "Id": 38,
+    "Name": "Eddy",
+    "Abbreviation": "DOG"
+  },
+  {
+    "Id": 39,
+    "Name": "Lidia",
+    "Abbreviation": "CBR"
+  },
+  {
+    "Id": 40,
+    "Name": "Heihachi",
+    "Abbreviation": "BEE"
+  },
+  {
+    "Id": 41,
+    "Name": "Clive",
+    "Abbreviation": "CLL"
+  },
+  {
+    "Id": 116,
+    "Name": "Practice Dummy",
+    "Abbreviation": "DEK"
+  },
+  {
+    "Id": 117,
+    "Name": "Angel Jin",
+    "Abbreviation": "XXA"
+  },
+  {
+    "Id": 118,
+    "Name": "True Devil Kazuya",
+    "Abbreviation": "XXB"
+  },
+  {
+    "Id": 119,
+    "Name": "Jack-7",
+    "Abbreviation": "XXC"
+  },
+  {
+    "Id": 120,
+    "Name": "Soldier",
+    "Abbreviation": "XXD"
+  },
+  {
+    "Id": 121,
+    "Name": "Devil Jin (Jin's voice)",
+    "Abbreviation": "XXE"
+  },
+  {
+    "Id": 122,
+    "Name": "Tekken Monk",
+    "Abbreviation": "XXF"
+  },
+  {
+    "Id": 123,
+    "Name": "Seiryu",
+    "Abbreviation": "XXG"
+  }
+]

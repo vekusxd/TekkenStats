@@ -1,4 +1,5 @@
 using System.Net.Http.Json;
+using TekkenStats.Application.Services;
 using TekkenStats.Core.Models;
 using TekkenStats.DataAccess;
 
@@ -30,6 +31,8 @@ public class Seeder : BackgroundService
             await using var scope = _serviceProvider.CreateAsyncScope();
             var httpClientFactory = scope.ServiceProvider.GetRequiredService<IHttpClientFactory>();
 
+            var responseProcessor = scope.ServiceProvider.GetRequiredService<WavuWankResponseProcessor>();
+
             var client = httpClientFactory.CreateClient("WavuWankClient");
 
             _beginTime -= 700;
@@ -42,9 +45,10 @@ public class Seeder : BackgroundService
 
             await foreach (var item in result)
             {
+                await responseProcessor.ProcessResponse(item!);
             }
 
             await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken);
-        }
+        }   
     }
 }

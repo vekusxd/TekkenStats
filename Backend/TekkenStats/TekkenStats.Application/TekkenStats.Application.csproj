@@ -11,4 +11,11 @@
       <ProjectReference Include="..\TekkenStats.DataAccess\TekkenStats.DataAccess.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="MassTransit" Version="8.4.0" />
+      <PackageReference Include="MassTransit.RabbitMQ" Version="8.4.0" />
+      <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.3" />
+      <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.3" />
+    </ItemGroup>
+
 </Project>

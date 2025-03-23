@@ -9,10 +9,10 @@ using TekkenStats.DataAccess;
 
 #nullable disable
 
-namespace TekkenStats.API.Migrations
+namespace TekkenStats.DataAccess.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250322201217_init")]
+    [Migration("20250323082441_init")]
     partial class init
     {
         /// <inheritdoc />
@@ -25,7 +25,7 @@ namespace TekkenStats.API.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("TekkenStats.API.Data.Models.Battle", b =>
+            modelBuilder.Entity("TekkenStats.Core.Models.Battle", b =>
                 {
                     b.Property<string>("Id")
                         .HasMaxLength(50)
@@ -86,17 +86,13 @@ namespace TekkenStats.API.Migrations
 
                     b.HasIndex("PlayerCharacter2Id");
 
-                    b.ToTable("Battle");
+                    b.ToTable("Battles");
                 });
 
-            modelBuilder.Entity("TekkenStats.API.Data.Models.Character", b =>
+            modelBuilder.Entity("TekkenStats.Core.Models.Character", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasMaxLength(50)
                         .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Abbreviation")
                         .IsRequired()
@@ -105,14 +101,15 @@ namespace TekkenStats.API.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Character");
+                    b.ToTable("Characters");
                 });
 
-            modelBuilder.Entity("TekkenStats.API.Data.Models.CharacterInfo", b =>
+            modelBuilder.Entity("TekkenStats.Core.Models.CharacterInfo", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -143,10 +140,10 @@ namespace TekkenStats.API.Migrations
 
                     b.HasIndex("PlayerId");
 
-                    b.ToTable("CharacterInfo");
+                    b.ToTable("CharacterInfos");
                 });
 
-            modelBuilder.Entity("TekkenStats.API.Data.Models.Player", b =>
+            modelBuilder.Entity("TekkenStats.Core.Models.Player", b =>
                 {
                     b.Property<string>("Id")
                         .HasMaxLength(50)
@@ -160,10 +157,10 @@ namespace TekkenStats.API.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Player");
+                    b.ToTable("Players");
                 });
 
-            modelBuilder.Entity("TekkenStats.API.Data.Models.PlayerName", b =>
+            modelBuilder.Entity("TekkenStats.Core.Models.PlayerName", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -185,30 +182,30 @@ namespace TekkenStats.API.Migrations
 
                     b.HasIndex("PlayerId");
 
-                    b.ToTable("PlayerName");
+                    b.ToTable("PlayerNames");
                 });
 
-            modelBuilder.Entity("TekkenStats.API.Data.Models.Battle", b =>
+            modelBuilder.Entity("TekkenStats.Core.Models.Battle", b =>
                 {
-                    b.HasOne("TekkenStats.API.Data.Models.Player", "Player1")
+                    b.HasOne("TekkenStats.Core.Models.Player", "Player1")
                         .WithMany("Player1Battles")
                         .HasForeignKey("Player1Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("TekkenStats.API.Data.Models.Player", "Player2")
+                    b.HasOne("TekkenStats.Core.Models.Player", "Player2")
                         .WithMany("Player2Battles")
                         .HasForeignKey("Player2Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("TekkenStats.API.Data.Models.Character", "PlayerCharacter1")
+                    b.HasOne("TekkenStats.Core.Models.Character", "PlayerCharacter1")
                         .WithMany("Character1Battles")
                         .HasForeignKey("PlayerCharacter1Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("TekkenStats.API.Data.Models.Character", "PlayerCharacter2")
+                    b.HasOne("TekkenStats.Core.Models.Character", "PlayerCharacter2")
                         .WithMany("Character2Battles")
                         .HasForeignKey("PlayerCharacter2Id")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -223,15 +220,15 @@ namespace TekkenStats.API.Migrations
                     b.Navigation("PlayerCharacter2");
                 });
 
-            modelBuilder.Entity("TekkenStats.API.Data.Models.CharacterInfo", b =>
+            modelBuilder.Entity("TekkenStats.Core.Models.CharacterInfo", b =>
                 {
-                    b.HasOne("TekkenStats.API.Data.Models.Character", "Character")
+                    b.HasOne("TekkenStats.Core.Models.Character", "Character")
                         .WithMany("CharacterInfos")
                         .HasForeignKey("CharacterId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("TekkenStats.API.Data.Models.Player", "Player")
+                    b.HasOne("TekkenStats.Core.Models.Player", "Player")
                         .WithMany("CharacterInfos")
                         .HasForeignKey("PlayerId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -242,9 +239,9 @@ namespace TekkenStats.API.Migrations
                     b.Navigation("Player");
                 });
 
-            modelBuilder.Entity("TekkenStats.API.Data.Models.PlayerName", b =>
+            modelBuilder.Entity("TekkenStats.Core.Models.PlayerName", b =>
                 {
-                    b.HasOne("TekkenStats.API.Data.Models.Player", "Player")
+                    b.HasOne("TekkenStats.Core.Models.Player", "Player")
                         .WithMany("Names")
                         .HasForeignKey("PlayerId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -253,7 +250,7 @@ namespace TekkenStats.API.Migrations
                     b.Navigation("Player");
                 });
 
-            modelBuilder.Entity("TekkenStats.API.Data.Models.Character", b =>
+            modelBuilder.Entity("TekkenStats.Core.Models.Character", b =>
                 {
                     b.Navigation("Character1Battles");
 
@@ -262,7 +259,7 @@ namespace TekkenStats.API.Migrations
                     b.Navigation("CharacterInfos");
                 });
 
-            modelBuilder.Entity("TekkenStats.API.Data.Models.Player", b =>
+            modelBuilder.Entity("TekkenStats.Core.Models.Player", b =>
                 {
                     b.Navigation("CharacterInfos");
 

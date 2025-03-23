@@ -1,10 +1,9 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
-using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace TekkenStats.API.Migrations
+namespace TekkenStats.DataAccess.Migrations
 {
     /// <inheritdoc />
     public partial class init : Migration
@@ -13,21 +12,20 @@ namespace TekkenStats.API.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Character",
+                name: "Characters",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", maxLength: 50, nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Name = table.Column<string>(type: "text", nullable: false),
+                    Id = table.Column<int>(type: "integer", nullable: false),
+                    Name = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
                     Abbreviation = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Character", x => x.Id);
+                    table.PrimaryKey("PK_Characters", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Player",
+                name: "Players",
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
@@ -36,11 +34,11 @@ namespace TekkenStats.API.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Player", x => x.Id);
+                    table.PrimaryKey("PK_Players", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Battle",
+                name: "Battles",
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
@@ -60,35 +58,35 @@ namespace TekkenStats.API.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Battle", x => x.Id);
+                    table.PrimaryKey("PK_Battles", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Battle_Character_PlayerCharacter1Id",
+                        name: "FK_Battles_Characters_PlayerCharacter1Id",
                         column: x => x.PlayerCharacter1Id,
-                        principalTable: "Character",
+                        principalTable: "Characters",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Battle_Character_PlayerCharacter2Id",
+                        name: "FK_Battles_Characters_PlayerCharacter2Id",
                         column: x => x.PlayerCharacter2Id,
-                        principalTable: "Character",
+                        principalTable: "Characters",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Battle_Player_Player1Id",
+                        name: "FK_Battles_Players_Player1Id",
                         column: x => x.Player1Id,
-                        principalTable: "Player",
+                        principalTable: "Players",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Battle_Player_Player2Id",
+                        name: "FK_Battles_Players_Player2Id",
                         column: x => x.Player2Id,
-                        principalTable: "Player",
+                        principalTable: "Players",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "CharacterInfo",
+                name: "CharacterInfos",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -101,23 +99,23 @@ namespace TekkenStats.API.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_CharacterInfo", x => x.Id);
+                    table.PrimaryKey("PK_CharacterInfos", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_CharacterInfo_Character_CharacterId",
+                        name: "FK_CharacterInfos_Characters_CharacterId",
                         column: x => x.CharacterId,
-                        principalTable: "Character",
+                        principalTable: "Characters",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_CharacterInfo_Player_PlayerId",
+                        name: "FK_CharacterInfos_Players_PlayerId",
                         column: x => x.PlayerId,
-                        principalTable: "Player",
+                        principalTable: "Players",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "PlayerName",
+                name: "PlayerNames",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -127,48 +125,48 @@ namespace TekkenStats.API.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_PlayerName", x => x.Id);
+                    table.PrimaryKey("PK_PlayerNames", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_PlayerName_Player_PlayerId",
+                        name: "FK_PlayerNames_Players_PlayerId",
                         column: x => x.PlayerId,
-                        principalTable: "Player",
+                        principalTable: "Players",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Battle_Player1Id",
-                table: "Battle",
+                name: "IX_Battles_Player1Id",
+                table: "Battles",
                 column: "Player1Id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Battle_Player2Id",
-                table: "Battle",
+                name: "IX_Battles_Player2Id",
+                table: "Battles",
                 column: "Player2Id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Battle_PlayerCharacter1Id",
-                table: "Battle",
+                name: "IX_Battles_PlayerCharacter1Id",
+                table: "Battles",
                 column: "PlayerCharacter1Id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Battle_PlayerCharacter2Id",
-                table: "Battle",
+                name: "IX_Battles_PlayerCharacter2Id",
+                table: "Battles",
                 column: "PlayerCharacter2Id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_CharacterInfo_CharacterId",
-                table: "CharacterInfo",
+                name: "IX_CharacterInfos_CharacterId",
+                table: "CharacterInfos",
                 column: "CharacterId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_CharacterInfo_PlayerId",
-                table: "CharacterInfo",
+                name: "IX_CharacterInfos_PlayerId",
+                table: "CharacterInfos",
                 column: "PlayerId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_PlayerName_PlayerId",
-                table: "PlayerName",
+                name: "IX_PlayerNames_PlayerId",
+                table: "PlayerNames",
                 column: "PlayerId");
         }
 
@@ -176,19 +174,19 @@ namespace TekkenStats.API.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Battle");
+                name: "Battles");
 
             migrationBuilder.DropTable(
-                name: "CharacterInfo");
+                name: "CharacterInfos");
 
             migrationBuilder.DropTable(
-                name: "PlayerName");
+                name: "PlayerNames");
 
             migrationBuilder.DropTable(
-                name: "Character");
+                name: "Characters");
 
             migrationBuilder.DropTable(
-                name: "Player");
+                name: "Players");
         }
     }
 }

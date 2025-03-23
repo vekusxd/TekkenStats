@@ -13,11 +13,12 @@
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.2"/>
+        <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.3"/>
         <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.3" />
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\TekkenStats.Application\TekkenStats.Application.csproj" />
       <ProjectReference Include="..\TekkenStats.Core\TekkenStats.Core.csproj" />
       <ProjectReference Include="..\TekkenStats.DataAccess\TekkenStats.DataAccess.csproj" />
     </ItemGroup>

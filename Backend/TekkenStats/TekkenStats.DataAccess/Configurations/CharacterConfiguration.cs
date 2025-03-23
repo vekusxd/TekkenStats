@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore.Storage;
 using TekkenStats.Core.Models;
 
 namespace TekkenStats.DataAccess.Configurations;
@@ -12,10 +13,14 @@ public class CharacterConfiguration : IEntityTypeConfiguration<Character>
 
         builder
             .Property(c => c.Id)
-            .HasMaxLength(50);
+            .ValueGeneratedNever();
 
         builder
             .Property(c => c.Abbreviation)
+            .HasMaxLength(50);
+
+        builder
+            .Property(c => c.Name)
             .HasMaxLength(50);
 
         builder
