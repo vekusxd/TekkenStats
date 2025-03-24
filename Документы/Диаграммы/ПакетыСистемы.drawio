@@ -1,0 +1,34 @@
+<mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/26.0.9 Chrome/128.0.6613.186 Electron/32.2.5 Safari/537.36" version="26.0.9">
+  <diagram name="Страница — 1" id="923UogB0L3UKOu8DKRZQ">
+    <mxGraphModel dx="1434" dy="884" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="uBBCmgSsdYnmEhgAEZ7j-1" value="Сбор данных" style="shape=module;align=left;spacingLeft=20;align=center;verticalAlign=top;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="120" y="70" width="100" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="uBBCmgSsdYnmEhgAEZ7j-2" value="Обработка данных" style="shape=module;align=left;spacingLeft=20;align=center;verticalAlign=top;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="120" y="170" width="100" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="uBBCmgSsdYnmEhgAEZ7j-3" value="" style="shape=folder;fontStyle=1;spacingTop=10;tabWidth=40;tabHeight=14;tabPosition=left;html=1;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="350" y="30" width="310" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="uBBCmgSsdYnmEhgAEZ7j-4" value="Бд боев" style="shape=folder;fontStyle=1;spacingTop=10;tabWidth=40;tabHeight=14;tabPosition=left;html=1;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="400" y="80" width="120" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="uBBCmgSsdYnmEhgAEZ7j-5" value="Use" style="endArrow=open;endSize=12;dashed=1;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0;entryDx=0;entryDy=14;entryPerimeter=0;" edge="1" parent="1" source="uBBCmgSsdYnmEhgAEZ7j-1" target="uBBCmgSsdYnmEhgAEZ7j-4">
+          <mxGeometry width="160" relative="1" as="geometry">
+            <mxPoint x="240" y="100" as="sourcePoint" />
+            <mxPoint x="400" y="100" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="uBBCmgSsdYnmEhgAEZ7j-6" value="Use" style="endArrow=open;endSize=12;dashed=1;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0;entryDx=0;entryDy=71;entryPerimeter=0;" edge="1" parent="1" source="uBBCmgSsdYnmEhgAEZ7j-2" target="uBBCmgSsdYnmEhgAEZ7j-4">
+          <mxGeometry width="160" relative="1" as="geometry">
+            <mxPoint x="260" y="340" as="sourcePoint" />
+            <mxPoint x="420" y="340" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
