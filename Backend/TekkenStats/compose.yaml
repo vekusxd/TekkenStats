@@ -1,14 +1,41 @@
-﻿services:
-  tekkenstats:
-    container_name: tekkenstats_app
-    image: tekkenstats
+﻿version: '3.8'
+
+services:
+  tekkenstats_api:
+    container_name: tekkenstats_api
+    image: tekkenstats_api
+    environment:
+      ConnectionStrings__DefaultConnection: "Server=postgres;Port=5432;Database=tekkenstatsDb;User Id=postgres;Password=root;Include Error Detail=true"
+      RabbitMQOptions__Host: "rabbit"
+      RabbitMQOptions__Username: "guest"
+      RabbitMQOptions__Password: "guest"
     build:
       context: .
       dockerfile: TekkenStats.API/Dockerfile
     depends_on:
-      - postgres
-      - rabbit
-  
+      rabbit:
+        condition: service_healthy
+    networks:
+      - app-network
+
+  tekkenstats_processingService:
+    image: tekkenstats_processing_service
+    environment:
+      ConnectionStrings__DefaultConnection: "Server=postgres;Port=5432;Database=tekkenstatsDb;User Id=postgres;Password=root;Include Error Detail=true"
+      RabbitMQOptions__Host: "rabbit"
+      RabbitMQOptions__Username: "guest"
+      RabbitMQOptions__Password: "guest"
+    build:
+      context: .
+      dockerfile: TekkenStats.ProcessingService/Dockerfile
+    depends_on:
+      rabbit:
+        condition: service_healthy
+    deploy:
+      replicas: 5
+    networks:
+      - app-network
+
   postgres:
     container_name: tekkenstats_db
     image: postgres
@@ -21,7 +48,9 @@
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-  
+    networks:
+      - app-network
+
   rabbit:
     image: rabbitmq:3-management
     container_name: tekkenstats_q
@@ -32,12 +61,17 @@
     volumes:
       - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
       - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
+    healthcheck:
+      test: [ "CMD", "rabbitmqctl", "status" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
-      - rabbitmq_go_net
+      - app-network
 
 volumes:
   postgres_data:
 
 networks:
-  rabbitmq_go_net:
+  app-network:
     driver: bridge

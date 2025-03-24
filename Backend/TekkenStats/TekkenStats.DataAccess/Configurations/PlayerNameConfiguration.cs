@@ -15,6 +15,8 @@ public class PlayerNameConfiguration : IEntityTypeConfiguration<PlayerName>
             .IsRequired()
             .HasMaxLength(255);
 
+        builder.HasIndex(n => n.NormalizedName);
+    
         builder
             .HasOne(n => n.Player)
             .WithMany(p => p.Names)

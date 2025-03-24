@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using EFCore.BulkExtensions;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using TekkenStats.Core.Models;
 using TekkenStats.DataAccess;
@@ -18,6 +19,11 @@ public class WavuWankResponseProcessor
 
     public async Task ProcessResponse(WavuWankResponse response)
     {
+        var playersToAdd = new List<Player>();
+        var playerNamesToAdd = new List<PlayerName>();
+        var characterInfosToAdd = new List<CharacterInfo>();
+        var battlesToAdd = new List<Battle>();
+
         await using var transaction = await _dbContext.Database.BeginTransactionAsync();
         try
         {
@@ -31,19 +37,21 @@ public class WavuWankResponseProcessor
             var player1Id = response.P1PolarisId;
             var player2Id = response.P2PolarisId;
 
-            var player1 = await GetOrCreatePlayer(player1Id);
-            var player2 = await GetOrCreatePlayer(player2Id);
+            var player1 = await GetOrCreatePlayer(player1Id, playersToAdd);
+            var player2 = await GetOrCreatePlayer(player2Id, playersToAdd);
 
-            await TryAddName(player1, response.P1Name);
-            await TryAddName(player2, response.P2Name);
+            await TryAddName(player1, response.P1Name, playerNamesToAdd);
+            await TryAddName(player2, response.P2Name, playerNamesToAdd);
 
             await _dbContext.SaveChangesAsync();
 
             var player1Char = await GetCharacter(response.P1CharaId);
             var player2Char = await GetCharacter(response.P2CharaId);
 
-            var player1CharacterInfo = await GetOrCreateCharacterInfo(player1Id, response.P1CharaId, player1Char);
-            var player2CharacterInfo = await GetOrCreateCharacterInfo(player2Id, response.P2CharaId, player2Char);
+            var player1CharacterInfo =
+                await GetOrCreateCharacterInfo(player1Id, response.P1CharaId, player1Char, characterInfosToAdd);
+            var player2CharacterInfo =
+                await GetOrCreateCharacterInfo(player2Id, response.P2CharaId, player1Char, characterInfosToAdd);
 
 
             if (response.Winner == 1)
@@ -88,9 +96,13 @@ public class WavuWankResponseProcessor
                 Winner = response.Winner
             };
 
-            _dbContext.Battles.Add(battle);
+            battlesToAdd.Add(battle);
 
-            await _dbContext.SaveChangesAsync();
+            await _dbContext.BulkInsertOrUpdateAsync(playersToAdd);
+            await _dbContext.BulkInsertOrUpdateAsync(playerNamesToAdd);
+            await _dbContext.BulkInsertOrUpdateAsync(characterInfosToAdd);
+            await _dbContext.BulkInsertOrUpdateAsync(battlesToAdd);
+
             await transaction.CommitAsync();
         }
         catch (Exception ex)
@@ -100,13 +112,13 @@ public class WavuWankResponseProcessor
         }
     }
 
-    public async Task<Character> GetCharacter(int characterId)
+    private async Task<Character> GetCharacter(int characterId)
     {
         return await _dbContext.Characters.FirstOrDefaultAsync(c => c.Id == characterId) ??
                throw new Exception($"Character with id: {characterId} not found");
     }
 
-    public async Task TryAddName(Player player, string username)
+    private async Task TryAddName(Player player, string username, List<PlayerName> playerNamesToAdd)
     {
         await _dbContext.Entry(player).Collection(p => p.Names).LoadAsync();
         var contains = player.Names.Any(n => n.Name == username);
@@ -115,18 +127,18 @@ public class WavuWankResponseProcessor
         var playerName = new PlayerName
         {
             Name = username,
+            NormalizedName = username.ToUpperInvariant(),
             Date = DateOnly.FromDateTime(DateTime.UtcNow),
             PlayerId = player.Id
         };
-        _dbContext.PlayerNames.Add(playerName);
-        await _dbContext.SaveChangesAsync();
+        playerNamesToAdd.Add(playerName);
     }
 
-    public async Task<CharacterInfo> GetOrCreateCharacterInfo(string playerId, int characterId, Character character)
+    private async Task<CharacterInfo> GetOrCreateCharacterInfo(string playerId, int characterId, Character character,
+        List<CharacterInfo> characterInfosToAdd)
     {
-        var characterInfo =
-            await _dbContext.CharacterInfos.FirstOrDefaultAsync(ci =>
-                ci.PlayerId == playerId && ci.CharacterId == characterId);
+        var characterInfo = await _dbContext.CharacterInfos
+            .FirstOrDefaultAsync(ci => ci.PlayerId == playerId && ci.CharacterId == characterId);
 
         if (characterInfo != null) return characterInfo;
 
@@ -140,12 +152,11 @@ public class WavuWankResponseProcessor
             LastPlayed = DateOnly.FromDateTime(DateTime.UtcNow),
             Rating = 0
         };
-        _dbContext.Add(characterInfo);
-        await _dbContext.SaveChangesAsync();
+        characterInfosToAdd.Add(characterInfo);
         return characterInfo;
     }
 
-    public async Task<Player> GetOrCreatePlayer(string playerId)
+    private async Task<Player> GetOrCreatePlayer(string playerId, List<Player> playersToAdd)
     {
         var player = await PlayerExists(playerId);
         if (player != null) return player;
@@ -156,12 +167,11 @@ public class WavuWankResponseProcessor
             WinCount = 0,
             LossCount = 0
         };
-        _dbContext.Add(player);
-        await _dbContext.SaveChangesAsync();
+        playersToAdd.Add(player);
         return player;
     }
 
-    public async Task<Player?> PlayerExists(string playerId)
+    private async Task<Player?> PlayerExists(string playerId)
     {
         return await _dbContext.Players
             .FirstOrDefaultAsync(p => p.Id == playerId);

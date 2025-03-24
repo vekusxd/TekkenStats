@@ -6,7 +6,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TekkenStats.DataAccess", "T
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TekkenStats.Core", "TekkenStats.Core\TekkenStats.Core.csproj", "{584476E1-8950-4475-8245-E0149C8736D4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TekkenStats.Seeder", "TekkenStats.Seeder\TekkenStats.Seeder.csproj", "{AAA179E9-1E1F-4C9F-8DB9-98B1CF8C3A30}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TekkenStats.ProcessingService", "TekkenStats.ProcessingService\TekkenStats.ProcessingService.csproj", "{AAA179E9-1E1F-4C9F-8DB9-98B1CF8C3A30}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TekkenStats.Application", "TekkenStats.Application\TekkenStats.Application.csproj", "{52E9080C-B8A3-4287-8771-EA76A7A1FE49}"
 EndProject

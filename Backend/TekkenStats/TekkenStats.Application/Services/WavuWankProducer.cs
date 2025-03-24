@@ -34,11 +34,16 @@ public class WavuWankProducer : BackgroundService
                     await client.GetFromJsonAsync<WavuWankResponse[]>("api/replays",
                         cancellationToken: stoppingToken) ?? throw new Exception("Response is null");
 
-                _logger.LogError("Response count: {}", result.Length);
+                _logger.LogInformation("Response count: {}", result.Length);
 
                 var publishEndpoint = scope.ServiceProvider.GetRequiredService<IPublishEndpoint>();
 
-                await publishEndpoint.Publish(result, stoppingToken);
+                var chunks = result.Chunk(500);
+
+                foreach (var chunk in chunks)
+                {
+                    await publishEndpoint.Publish(chunk, stoppingToken);
+                }
 
                 await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken);
             }
