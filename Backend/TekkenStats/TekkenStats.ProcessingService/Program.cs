@@ -1,5 +1,9 @@
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using MassTransit;
+using MassTransit.Configuration;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Hybrid;
 using TekkenStats.Application;
 using TekkenStats.Core.Options;
 using TekkenStats.DataAccess;
@@ -12,6 +16,25 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 
 builder.Services.AddDbContext<AppDbContext>(opts => opts.UseNpgsql(connectionString));
 builder.Services.AddApplication();
+
+var redisConnectionString = builder.Configuration.GetConnectionString("RedisConnection") ??
+                            throw new Exception("Redis connection string not found");
+
+builder.Services.AddStackExchangeRedisCache(opts => opts.Configuration = redisConnectionString);
+
+builder.Services.Configure<JsonSerializerOptions>(options =>
+{
+    options.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+});
+
+builder.Services.AddHybridCache(opts =>
+{
+    opts.DefaultEntryOptions = new HybridCacheEntryOptions
+    {
+        Expiration = TimeSpan.FromMinutes(5),
+        LocalCacheExpiration = TimeSpan.FromMinutes(5)
+    };
+});
 
 builder.Services.AddMassTransit(configurator =>
 {
@@ -29,7 +52,11 @@ builder.Services.AddMassTransit(configurator =>
         });
 
         cfg.ReceiveEndpoint("responseData_queue", endpointConfigurator =>
-            endpointConfigurator.Consumer<WavuWankConsumer>(context));
+        {
+            endpointConfigurator.UseTimeout(
+                timeoutConfigurator => timeoutConfigurator.Timeout = TimeSpan.FromMinutes(2));
+            endpointConfigurator.Consumer<WavuWankConsumer>(context);
+        });
 
         cfg.ConfigureEndpoints(context);
     });

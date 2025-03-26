@@ -1,4 +1,4 @@
-﻿namespace TekkenStats.Core.Models;
+﻿namespace TekkenStats.Core.Entities;
 
 public class Player
 {

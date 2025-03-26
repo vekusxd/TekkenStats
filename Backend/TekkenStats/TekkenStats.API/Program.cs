@@ -1,6 +1,9 @@
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using FluentValidation;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Hybrid;
 using Scalar.AspNetCore;
 using TekkenStats.API;
 using TekkenStats.API.Extensions;
@@ -15,10 +18,31 @@ builder.Services.AddOpenApi();
 
 builder.Services.Configure<RabbitOptions>(builder.Configuration.GetRequiredSection(RabbitOptions.Section));
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ??
-                       throw new Exception("Default connection string not found");
+var postgresConnectionString = builder.Configuration.GetConnectionString("DefaultConnection") ??
+                               throw new Exception("Default connection string not found");
 
-builder.Services.AddDbContext<AppDbContext>(opts => opts.UseNpgsql(connectionString));
+builder.Services.AddDbContext<AppDbContext>(opts => opts.UseNpgsql(postgresConnectionString));
+
+
+var redisConnectionString = builder.Configuration.GetConnectionString("RedisConnection") ??
+                            throw new Exception("Redis connection string not found");
+builder.Services.AddStackExchangeRedisCache(opts => opts.Configuration = redisConnectionString);
+
+builder.Services.AddHybridCache(opts =>
+{
+    opts.DefaultEntryOptions = new HybridCacheEntryOptions
+    {
+        Expiration = TimeSpan.FromMinutes(5),
+        LocalCacheExpiration = TimeSpan.FromMinutes(5)
+    };
+});
+
+
+builder.Services.Configure<JsonSerializerOptions>(options =>
+{
+    options.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+});
+
 builder.Services.AddScoped<DbSeeder>();
 builder.Services.AddApplication();
 builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);

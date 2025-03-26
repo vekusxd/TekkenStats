@@ -3,6 +3,7 @@ using FluentValidation;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Hybrid;
 using TekkenStats.DataAccess;
 
 namespace TekkenStats.API.Features.GetNames;
@@ -15,7 +16,9 @@ public class GetNames : IEndpoint
     }
 
     private static async Task<Results<ValidationProblem, Ok<IEnumerable<GetNamesResponse>>>> Handler(
-        [AsParameters] GetNamesRequest request, IValidator<GetNamesRequest> validator, AppDbContext dbContext)
+        [AsParameters] GetNamesRequest request,
+        IValidator<GetNamesRequest> validator,
+        AppDbContext dbContext)
     {
         var validationResult = await validator.ValidateAsync(request);
 

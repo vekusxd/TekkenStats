@@ -1,7 +1,8 @@
-﻿using EFCore.BulkExtensions;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Logging;
-using TekkenStats.Core.Models;
+using TekkenStats.Application.Mappers;
+using TekkenStats.Core.Entities;
 using TekkenStats.DataAccess;
 
 namespace TekkenStats.Application.Services;
@@ -10,13 +11,17 @@ public class WavuWankResponseProcessor
 {
     private readonly AppDbContext _dbContext;
     private readonly ILogger<WavuWankResponseProcessor> _logger;
+    private readonly HybridCache _cache;
 
-    public WavuWankResponseProcessor(AppDbContext dbContext, ILogger<WavuWankResponseProcessor> logger)
+    public WavuWankResponseProcessor(AppDbContext dbContext, ILogger<WavuWankResponseProcessor> logger,
+        HybridCache cache)
     {
         _dbContext = dbContext;
         _logger = logger;
+        _cache = cache;
     }
 
+    //TODO привязать полученные сущности перед сохранением
     public async Task ProcessResponse(WavuWankResponse response)
     {
         var playersToAdd = new List<Player>();
@@ -24,13 +29,12 @@ public class WavuWankResponseProcessor
         var characterInfosToAdd = new List<CharacterInfo>();
         var battlesToAdd = new List<Battle>();
 
-        await using var transaction = await _dbContext.Database.BeginTransactionAsync();
         try
         {
-            var existsBattle = await _dbContext.Battles.FirstOrDefaultAsync(b => b.Id == response.BattleId);
-            if (existsBattle != null)
+            await GetOrCreateBattle(response.BattleId, battlesToAdd);
+
+            if (battlesToAdd.Count != 0)
             {
-                await transaction.RollbackAsync();
                 return;
             }
 
@@ -72,8 +76,6 @@ public class WavuWankResponseProcessor
             player1CharacterInfo.Rating = response.P1Rank;
             player2CharacterInfo.Rating = response.P2Rank;
 
-            await _dbContext.SaveChangesAsync();
-
             var battle = new Battle
             {
                 Id = response.BattleId,
@@ -98,24 +100,29 @@ public class WavuWankResponseProcessor
 
             battlesToAdd.Add(battle);
 
-            await _dbContext.BulkInsertOrUpdateAsync(playersToAdd);
-            await _dbContext.BulkInsertOrUpdateAsync(playerNamesToAdd);
-            await _dbContext.BulkInsertOrUpdateAsync(characterInfosToAdd);
-            await _dbContext.BulkInsertOrUpdateAsync(battlesToAdd);
-
-            await transaction.CommitAsync();
+            await _dbContext.AddRangeAsync(playersToAdd);
+            await _dbContext.AddRangeAsync(playerNamesToAdd);
+            await _dbContext.AddRangeAsync(characterInfosToAdd);
+            await _dbContext.AddRangeAsync(battlesToAdd);
+            
+            await _dbContext.SaveChangesAsync();
         }
         catch (Exception ex)
         {
             _logger.LogError("Error occured: {ErrorMessage}", ex.Message);
-            await transaction.RollbackAsync();
         }
     }
 
     private async Task<Character> GetCharacter(int characterId)
     {
-        return await _dbContext.Characters.FirstOrDefaultAsync(c => c.Id == characterId) ??
-               throw new Exception($"Character with id: {characterId} not found");
+        var character = await _cache.GetOrCreateAsync($"character:{characterId}", async (token) =>
+        {
+            var innerCharacter = await _dbContext.Characters.FirstOrDefaultAsync(c => c.Id == characterId,
+                                     cancellationToken: token) ??
+                                 throw new NullReferenceException($"Character with id: {characterId} not found");
+            return CharacterMapper.FromEntity(innerCharacter);
+        });
+        return CharacterMapper.ToEntity(character);
     }
 
     private async Task TryAddName(Player player, string username, List<PlayerName> playerNamesToAdd)
@@ -134,7 +141,8 @@ public class WavuWankResponseProcessor
         playerNamesToAdd.Add(playerName);
     }
 
-    private async Task<CharacterInfo> GetOrCreateCharacterInfo(string playerId, int characterId, Character character,
+    private async Task<CharacterInfo> GetOrCreateCharacterInfo(string playerId, int characterId,
+        Character character,
         List<CharacterInfo> characterInfosToAdd)
     {
         var characterInfo = await _dbContext.CharacterInfos
@@ -156,24 +164,67 @@ public class WavuWankResponseProcessor
         return characterInfo;
     }
 
-    private async Task<Player> GetOrCreatePlayer(string playerId, List<Player> playersToAdd)
+    private async Task<Battle> GetOrCreateBattle(string battleId, List<Battle> battlesToAdd)
     {
-        var player = await PlayerExists(playerId);
-        if (player != null) return player;
+        var battle = await _cache.GetOrCreateAsync($"battle:{battleId}", async (token) =>
+            {
+                var battle =
+                    await _dbContext.Battles.FirstOrDefaultAsync(b => b.Id == battleId, cancellationToken: token);
 
-        player = new Player
-        {
-            Id = playerId,
-            WinCount = 0,
-            LossCount = 0
-        };
-        playersToAdd.Add(player);
-        return player;
+                if (battle != null) return BattleMapper.FromEntity(battle);
+
+                battle = new Battle
+                {
+                    Id = battleId,
+                    GameVersion = string.Empty,
+                    Player1Id = string.Empty,
+                    Player2Id = string.Empty
+                };
+
+                battlesToAdd.Add(battle);
+
+                return BattleMapper.FromEntity(battle);
+            },
+            new HybridCacheEntryOptions
+            {
+                LocalCacheExpiration = TimeSpan.FromMinutes(2),
+                Expiration = TimeSpan.FromMinutes(2)
+            });
+        return BattleMapper.ToEntity(battle);
     }
 
-    private async Task<Player?> PlayerExists(string playerId)
+    private async Task<Player> GetOrCreatePlayer(string playerId, List<Player> playersToAdd)
     {
-        return await _dbContext.Players
-            .FirstOrDefaultAsync(p => p.Id == playerId);
+        var existingPlayer = playersToAdd.FirstOrDefault(p => p.Id == playerId);
+        if (existingPlayer != null)
+        {
+            return existingPlayer;
+        }
+        var player = await _cache.GetOrCreateAsync(
+            key: $"player:{playerId}",
+            async (token) =>
+            {
+                var dbPlayer = await _dbContext.Players
+                    .FirstOrDefaultAsync(p => p.Id == playerId, cancellationToken: token);
+                if (dbPlayer != null)
+                {
+                    return PlayerMapper.FromEntity(dbPlayer);
+                }
+
+                var newPlayer = new Player
+                {
+                    Id = playerId,
+                    WinCount = 0,
+                    LossCount = 0
+                };
+
+                playersToAdd.Add(newPlayer);
+
+                return PlayerMapper.FromEntity(newPlayer);
+            }
+        );
+    
+        var cachedPlayer = PlayerMapper.ToEntity(player);
+        return playersToAdd.FirstOrDefault(p => p.Id == playerId) ?? cachedPlayer;
     }
 }

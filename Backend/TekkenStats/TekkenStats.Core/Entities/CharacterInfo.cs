@@ -1,4 +1,6 @@
-﻿namespace TekkenStats.Core.Models;
+﻿using System.Text.Json.Serialization;
+
+namespace TekkenStats.Core.Entities;
 
 public class CharacterInfo
 {

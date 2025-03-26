@@ -3,7 +3,8 @@ using MassTransit;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using TekkenStats.Core.Models;
+using TekkenStats.Application.Contracts;
+using TekkenStats.Core.Entities;
 
 namespace TekkenStats.Application.Services;
 
@@ -42,7 +43,8 @@ public class WavuWankProducer : BackgroundService
 
                 foreach (var chunk in chunks)
                 {
-                    await publishEndpoint.Publish(chunk, stoppingToken);
+                    await publishEndpoint.Publish(new WavuWankMessage { MessageId = Guid.NewGuid(), Responses = chunk },
+                        stoppingToken);
                 }
 
                 await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken);

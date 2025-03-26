@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using TekkenStats.Core.Models;
+using TekkenStats.Core.Entities;
 
 namespace TekkenStats.DataAccess.Configurations;
 
