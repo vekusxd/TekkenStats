@@ -2,12 +2,12 @@ using FluentValidation;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
-using TekkenStats.API;
 using TekkenStats.API.Extensions;
-using TekkenStats.Application;
-using TekkenStats.Application.Services;
+using TekkenStats.API.Features.DataFetcher;
+using TekkenStats.API.Features.SeedDb;
 using TekkenStats.Core.Options;
 using TekkenStats.DataAccess;
+using TekkenStats.DataAccess.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,10 +20,11 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 
 builder.Services.AddDbContext<AppDbContext>(opts => opts.UseNpgsql(connectionString));
 builder.Services.AddScoped<DbSeeder>();
-builder.Services.AddApplication();
 builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
 
-builder.Services.AddHostedService<WavuWankProducer>();
+builder.Services.AddMongoDb(builder.Configuration);
+
+builder.Services.AddHostedService<DataFetcher>();
 
 builder.Services.AddHttpClient("WavuWankClient", client =>
     client.BaseAddress = new Uri("https://wank.wavu.wiki/"));
@@ -52,9 +53,12 @@ builder.Services.AddCors(opts =>
         .AllowAnyMethod()
         .AllowAnyOrigin()));
 
+builder.Services.Configure<MongoOptions>(builder.Configuration.GetRequiredSection(MongoOptions.Section));
+
 builder.Services.AddEndpoints(typeof(Program).Assembly);
 
 var app = builder.Build();
+
 
 using (var scope = app.Services.CreateScope())
 {
@@ -70,6 +74,7 @@ if (app.Environment.IsDevelopment())
 else
 {
     using var scope = app.Services.CreateScope();
+    await scope.ServiceProvider.InitIndexes();
     var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     dbContext.Database.Migrate();
 }

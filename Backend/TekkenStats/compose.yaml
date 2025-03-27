@@ -1,6 +1,4 @@
-﻿version: '3.8'
-
-services:
+﻿services:
   tekkenstats_api:
     container_name: tekkenstats_api
     image: tekkenstats_api
@@ -9,6 +7,8 @@ services:
       RabbitMQOptions__Host: "rabbit"
       RabbitMQOptions__Username: "guest"
       RabbitMQOptions__Password: "guest"
+      MongoOptions__ConnectionString: "mongodb://admin:root@mongo:27017"
+      MongoOptions__DbName: "TekkenStats"
     build:
       context: .
       dockerfile: TekkenStats.API/Dockerfile
@@ -25,14 +25,14 @@ services:
       RabbitMQOptions__Host: "rabbit"
       RabbitMQOptions__Username: "guest"
       RabbitMQOptions__Password: "guest"
+      MongoOptions__ConnectionString: "mongodb://admin:root@mongo:27017"
+      MongoOptions__DbName: "TekkenStats"
     build:
       context: .
       dockerfile: TekkenStats.ProcessingService/Dockerfile
     depends_on:
       rabbit:
         condition: service_healthy
-    deploy:
-      replicas: 5
     networks:
       - app-network
 
@@ -50,6 +50,20 @@ services:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - app-network
+  
+  mongo:
+    container_name: tekkenstats_mongo_db
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: root
+    ports:
+      - "27017:27017"
+    networks:
+      - app-network
+    volumes:
+      - mongo_db_data:/data/db
 
   rabbit:
     image: rabbitmq:3-management
@@ -71,6 +85,7 @@ services:
 
 volumes:
   postgres_data:
+  mongo_db_data:
 
 networks:
   app-network:

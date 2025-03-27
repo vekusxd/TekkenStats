@@ -1,18 +1,14 @@
-﻿using System.Net.Http.Json;
-using MassTransit;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using TekkenStats.Core.Models;
+﻿using MassTransit;
+using TekkenStats.Core.Entities;
 
-namespace TekkenStats.Application.Services;
+namespace TekkenStats.API.Features.DataFetcher;
 
-public class WavuWankProducer : BackgroundService
+public class DataFetcher : BackgroundService
 {
-    private readonly ILogger<WavuWankProducer> _logger;
+    private readonly ILogger<DataFetcher> _logger;
     private readonly IServiceProvider _serviceProvider;
 
-    public WavuWankProducer(ILogger<WavuWankProducer> logger, IServiceProvider serviceProvider)
+    public DataFetcher(ILogger<DataFetcher> logger, IServiceProvider serviceProvider)
     {
         _logger = logger;
         _serviceProvider = serviceProvider;
@@ -38,12 +34,18 @@ public class WavuWankProducer : BackgroundService
 
                 var publishEndpoint = scope.ServiceProvider.GetRequiredService<IPublishEndpoint>();
 
-                var chunks = result.Chunk(500);
+                
+                //TODO
+                // var chunks = result.Chunk(500);
+                //
+                // foreach (var chunk in chunks)
+                // {
+                //     await publishEndpoint.Publish(
+                //         new DataMessage { MessageId = Guid.CreateVersion7(), Responses = chunk }, stoppingToken);
+                // }
 
-                foreach (var chunk in chunks)
-                {
-                    await publishEndpoint.Publish(chunk, stoppingToken);
-                }
+                await publishEndpoint.Publish(new DataMessage { MessageId = Guid.CreateVersion7(), Responses = result },
+                    stoppingToken);
 
                 await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken);
             }

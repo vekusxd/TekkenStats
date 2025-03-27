@@ -1,8 +1,8 @@
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
-using TekkenStats.Application;
 using TekkenStats.Core.Options;
 using TekkenStats.DataAccess;
+using TekkenStats.DataAccess.Extensions;
 using TekkenStats.Seeder;
 
 var builder = Host.CreateApplicationBuilder(args);
@@ -11,7 +11,11 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
                        throw new Exception("Connection string not found");
 
 builder.Services.AddDbContext<AppDbContext>(opts => opts.UseNpgsql(connectionString));
-builder.Services.AddApplication();
+builder.Services.AddScoped<ResponseProcessor>();
+
+builder.Services.Configure<MongoOptions>(builder.Configuration.GetRequiredSection(MongoOptions.Section));
+
+builder.Services.AddMongoDb(builder.Configuration);
 
 builder.Services.AddMassTransit(configurator =>
 {
@@ -19,7 +23,7 @@ builder.Services.AddMassTransit(configurator =>
                           ?? throw new Exception("RabbitMQ setting not found");
 
     configurator.SetKebabCaseEndpointNameFormatter();
-    configurator.AddConsumer<WavuWankConsumer>();
+    configurator.AddConsumer<DataProcessor>();
     configurator.UsingRabbitMq((context, cfg) =>
     {
         cfg.Host(rabbitMqOptions.Host, c =>
@@ -29,7 +33,7 @@ builder.Services.AddMassTransit(configurator =>
         });
 
         cfg.ReceiveEndpoint("responseData_queue", endpointConfigurator =>
-            endpointConfigurator.Consumer<WavuWankConsumer>(context));
+            endpointConfigurator.Consumer<DataProcessor>(context));
 
         cfg.ConfigureEndpoints(context);
     });
@@ -39,6 +43,7 @@ var host = builder.Build();
 
 using (var scope = host.Services.CreateScope())
 {
+    await scope.ServiceProvider.InitIndexes();
     var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     dbContext.Database.Migrate();
 }

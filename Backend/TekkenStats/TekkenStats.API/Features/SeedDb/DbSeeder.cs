@@ -1,10 +1,9 @@
 ﻿using System.Text.Json;
-using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
-using TekkenStats.Core.Models;
+using TekkenStats.Core.Entities;
 using TekkenStats.DataAccess;
 
-namespace TekkenStats.API;
+namespace TekkenStats.API.Features.SeedDb;
 
 public class DbSeeder
 {
