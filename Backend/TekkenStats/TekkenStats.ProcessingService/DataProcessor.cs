@@ -1,5 +1,6 @@
 ﻿using MassTransit;
 using Microsoft.EntityFrameworkCore;
+using TekkenStats.Core.Contracts;
 using TekkenStats.Core.Entities;
 using TekkenStats.DataAccess;
 

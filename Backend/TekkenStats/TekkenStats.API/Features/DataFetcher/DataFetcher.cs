@@ -1,4 +1,5 @@
 ﻿using MassTransit;
+using TekkenStats.Core.Contracts;
 using TekkenStats.Core.Entities;
 
 namespace TekkenStats.API.Features.DataFetcher;

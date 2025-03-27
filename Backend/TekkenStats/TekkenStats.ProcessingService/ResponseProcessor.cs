@@ -1,4 +1,5 @@
 ﻿using MongoDB.Driver;
+using TekkenStats.Core.Contracts;
 using TekkenStats.Core.Entities;
 using TekkenStats.DataAccess;
 using Player = TekkenStats.Core.Entities.Player;
@@ -75,26 +76,34 @@ public class ResponseProcessor
     {
         var collection = _db.GetCollection<Player>(Player.CollectionName);
         var filter = Builders<Player>.Filter.Eq(p => p.TekkenId, player.TekkenId);
-        
+
+        var existingPlayer = await collection.Find(filter).FirstOrDefaultAsync();
+
         var battleIdExistsFilter = Builders<Player>.Filter.And(
             filter,
             Builders<Player>.Filter.ElemMatch(
                 p => p.Matches,
                 m => m.BattleId == player.Match.BattleId)
         );
-        
+
         var battleIdExists = await collection.Find(battleIdExistsFilter).AnyAsync();
 
         var update = Builders<Player>.Update
             .Set(p => p.Power, player.Power)
-            .Set(p => p.Rank, player.Rank)
-            .AddToSet(p => p.Names, player.Name);
+            .Set(p => p.Rank, player.Rank);
+
+        if (existingPlayer == null || existingPlayer.CurrentName != player.Name)
+        {
+            update = update
+                .Set(p => p.CurrentName, player.Name)
+                .Push(p => p.Names, new Name { PlayerName = player.Name, Date = DateTime.UtcNow });
+        }
 
         if (!battleIdExists)
         {
             update = update.Push(p => p.Matches, player.Match);
         }
-        
+
         await collection.UpdateOneAsync(filter, update, new UpdateOptions { IsUpsert = true });
     }
 

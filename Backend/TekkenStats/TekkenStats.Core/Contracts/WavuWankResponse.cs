@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace TekkenStats.Core.Entities;
+namespace TekkenStats.Core.Contracts;
 
 public class WavuWankResponse
 {

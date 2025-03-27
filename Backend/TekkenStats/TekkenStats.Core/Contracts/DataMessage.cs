@@ -1,4 +1,4 @@
-﻿namespace TekkenStats.Core.Entities;
+﻿namespace TekkenStats.Core.Contracts;
 
 public class DataMessage
 {
