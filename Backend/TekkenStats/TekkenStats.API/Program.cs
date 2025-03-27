@@ -62,6 +62,9 @@ var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
+    await scope.ServiceProvider.InitIndexes();
+    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    dbContext.Database.Migrate();
     var seeder = scope.ServiceProvider.GetRequiredService<DbSeeder>();
     await seeder.SeedDb();
 }
@@ -70,13 +73,6 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
     app.MapScalarApiReference();
-}
-else
-{
-    using var scope = app.Services.CreateScope();
-    await scope.ServiceProvider.InitIndexes();
-    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    dbContext.Database.Migrate();
 }
 
 app.UseHttpsRedirection();
