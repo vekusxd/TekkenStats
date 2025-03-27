@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using TekkenStats.Core.Entities;
+using TekkenStats.Core.Models;
 
 namespace TekkenStats.DataAccess;
 
@@ -10,7 +10,6 @@ public class AppDbContext : DbContext
     public DbSet<CharacterInfo> CharacterInfos { get; set; }
     public DbSet<Player> Players { get; set; }
     public DbSet<PlayerName> PlayerNames { get; set; }
-    public DbSet<ProcessedMessage> ProcessedMessages { get; set; }
     
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {

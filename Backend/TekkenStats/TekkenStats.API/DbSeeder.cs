@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
-using TekkenStats.Core.Entities;
+using TekkenStats.Core.Models;
 using TekkenStats.DataAccess;
 
 namespace TekkenStats.API;

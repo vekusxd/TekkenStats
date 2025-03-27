@@ -1,6 +1,7 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Text;
+using System.Text.Json.Serialization;
 
-namespace TekkenStats.Core.Entities;
+namespace TekkenStats.Core.Models;
 
 public class WavuWankResponse
 {

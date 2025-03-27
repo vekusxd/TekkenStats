@@ -1,4 +1,4 @@
-﻿using TekkenStats.Core.Entities;
+﻿using TekkenStats.Core.Models;
 
 namespace TekkenStats.API.Features.GetNames;
 

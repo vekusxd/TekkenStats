@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.Storage;
-using TekkenStats.Core.Entities;
+using TekkenStats.Core.Models;
 
 namespace TekkenStats.DataAccess.Configurations;
 
