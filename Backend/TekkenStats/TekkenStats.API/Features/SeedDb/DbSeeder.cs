@@ -19,6 +19,7 @@ public class DbSeeder
     public async Task SeedDb()
     {
         var filePath = Path.Combine(_environment.WebRootPath, "data", "characters.json");
+        if (_dbContext.Characters.Any()) return;
         var content = await File.ReadAllTextAsync(filePath);
         var data = JsonSerializer.Deserialize<IEnumerable<Character>>(content);
         foreach (var item in data!)

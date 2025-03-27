@@ -1,4 +1,5 @@
 ﻿using MassTransit;
+using Microsoft.EntityFrameworkCore;
 using TekkenStats.Core.Entities;
 using TekkenStats.DataAccess;
 
@@ -20,25 +21,33 @@ public class DataProcessor : IConsumer<DataMessage>
 
     public async Task Consume(ConsumeContext<DataMessage> context)
     {
-        //TODO
-        // await using var transaction = await _dbContext.Database.BeginTransactionAsync();
-        // var messageId = context.Message.MessageId;
-        // var message = await _dbContext.ProcessedMessages.FirstOrDefaultAsync(m => m.MessageId == messageId);
-        // if (message != null)
-        // {
-        //     _logger.LogInformation("Message: {} already processed", messageId);
-        //     await transaction.RollbackAsync();
-        //     return;
-        // }
-
-        // _dbContext.ProcessedMessages.Add(new ProcessedMessage { MessageId = messageId });
-        foreach (var item in context.Message.Responses)
+        await using var transaction = await _dbContext.Database.BeginTransactionAsync();
+        try
         {
-            await _responseProcessor.ProcessResponse(item);
-        }
+            var messageId = context.Message.MessageId;
+            var message = await _dbContext.ProcessedMessages.FirstOrDefaultAsync(m => m.MessageId == messageId);
+            if (message != null)
+            {
+                _logger.LogInformation("Message: {} already processed", messageId);
+                await transaction.RollbackAsync();
+                return;
+            }
 
-        // await _dbContext.SaveChangesAsync();
-        // await transaction.CommitAsync();
-        _logger.LogInformation("Response processing done");
+            _dbContext.ProcessedMessages.Add(new ProcessedMessage { MessageId = messageId });
+
+            foreach (var item in context.Message.Responses)
+            {
+                await _responseProcessor.ProcessResponse(item);
+            }
+
+            await _dbContext.SaveChangesAsync();
+            await transaction.CommitAsync();
+            _logger.LogInformation("Response processing done");
+        }
+        catch (Exception ex)
+        {
+            await transaction.RollbackAsync();
+            _logger.LogError(ex, "Error processing message");
+        }
     }
 }

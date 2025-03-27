@@ -9,7 +9,7 @@ public class ProcessedMessageConfiguration : IEntityTypeConfiguration<ProcessedM
     public void Configure(EntityTypeBuilder<ProcessedMessage> builder)
     {
         builder.HasKey(x => x.Id);
-        
-        builder.HasIndex(x => x.MessageId);
+
+        builder.HasIndex(x => x.MessageId).IsUnique();
     }
 }

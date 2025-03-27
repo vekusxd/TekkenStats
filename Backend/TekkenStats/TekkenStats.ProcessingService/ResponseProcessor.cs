@@ -18,7 +18,7 @@ public class ResponseProcessor
 
     public async Task ProcessResponse(WavuWankResponse response)
     {
-        var date = DateTimeOffset.FromUnixTimeSeconds(response.BattleAt).DateTime;
+        var date = DateTimeOffset.FromUnixTimeMilliseconds(response.BattleAt).DateTime;
 
         var firstPlayerInfo = new PlayerInfo(
             characterId: response.P1CharaId,
@@ -82,7 +82,7 @@ public class ResponseProcessor
             .Set(p => p.Power, player.Power)
             .Set(p => p.Rank, player.Rank)
             .AddToSet(p => p.Names, player.Name)
-            .AddToSet(p => p.Matches, player.Match);
+            .Push(p => p.Matches, player.Match);
 
         await collection.UpdateOneAsync(filter, update, new UpdateOptions { IsUpsert = true });
     }

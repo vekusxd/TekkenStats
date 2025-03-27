@@ -24,16 +24,19 @@ builder.Services.AddMassTransit(configurator =>
 
     configurator.SetKebabCaseEndpointNameFormatter();
     configurator.AddConsumer<DataProcessor>();
+
     configurator.UsingRabbitMq((context, cfg) =>
     {
+        cfg.UseConcurrencyLimit(1);
+        cfg.UseTimeout(timeoutConfigurator => timeoutConfigurator.Timeout = TimeSpan.FromMinutes(2));
         cfg.Host(rabbitMqOptions.Host, c =>
         {
             c.Username(rabbitMqOptions.Username);
             c.Password(rabbitMqOptions.Password);
         });
 
-        cfg.ReceiveEndpoint("responseData_queue", endpointConfigurator =>
-            endpointConfigurator.Consumer<DataProcessor>(context));
+        cfg.ReceiveEndpoint("responseData_queue",
+            endpointConfigurator => { endpointConfigurator.Consumer<DataProcessor>(context); });
 
         cfg.ConfigureEndpoints(context);
     });

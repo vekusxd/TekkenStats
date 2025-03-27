@@ -10,7 +10,6 @@ WORKDIR /src
 COPY ["TekkenStats.API/TekkenStats.API.csproj", "TekkenStats.API/"]
 COPY ["TekkenStats.DataAccess/TekkenStats.DataAccess.csproj", "TekkenStats.DataAccess/"]
 COPY ["TekkenStats.Core/TekkenStats.Core.csproj", "TekkenStats.Core/"]
-COPY ["TekkenStats.Application/TekkenStats.Application.csproj", "TekkenStats.Application/"]
 RUN dotnet restore "TekkenStats.API/TekkenStats.API.csproj"
 COPY . .
 WORKDIR "/src/TekkenStats.API"

@@ -32,20 +32,15 @@ public class DataFetcher : BackgroundService
 
                 _logger.LogInformation("Response count: {}", result.Length);
 
-                var publishEndpoint = scope.ServiceProvider.GetRequiredService<IPublishEndpoint>();
+                var endpoint = scope.ServiceProvider.GetRequiredService<IPublishEndpoint>();
 
-                
-                //TODO
-                // var chunks = result.Chunk(500);
-                //
-                // foreach (var chunk in chunks)
-                // {
-                //     await publishEndpoint.Publish(
-                //         new DataMessage { MessageId = Guid.CreateVersion7(), Responses = chunk }, stoppingToken);
-                // }
+                var chunks = result.Chunk(500);
 
-                await publishEndpoint.Publish(new DataMessage { MessageId = Guid.CreateVersion7(), Responses = result },
-                    stoppingToken);
+                foreach (var chunk in chunks)
+                {
+                    await endpoint.Publish(new DataMessage { MessageId = Guid.CreateVersion7(), Responses = chunk },
+                        stoppingToken);
+                }
 
                 await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken);
             }
