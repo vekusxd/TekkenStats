@@ -7,18 +7,16 @@ namespace TekkenStats.Seeder;
 
 public class ResponseProcessor
 {
-    private readonly ILogger<ResponseProcessor> _logger;
     private readonly IMongoDatabase _db;
 
-    public ResponseProcessor(ILogger<ResponseProcessor> logger, MongoDatabase database)
+    public ResponseProcessor(MongoDatabase database)
     {
-        _logger = logger;
         _db = database.Db;
     }
 
     public async Task ProcessResponse(WavuWankResponse response)
     {
-        var date = DateTimeOffset.FromUnixTimeMilliseconds(response.BattleAt).DateTime;
+        var date = DateTimeOffset.FromUnixTimeSeconds(response.BattleAt).DateTime;
 
         var firstPlayerInfo = new PlayerInfo(
             characterId: response.P1CharaId,
@@ -77,13 +75,26 @@ public class ResponseProcessor
     {
         var collection = _db.GetCollection<Player>(Player.CollectionName);
         var filter = Builders<Player>.Filter.Eq(p => p.TekkenId, player.TekkenId);
+        
+        var battleIdExistsFilter = Builders<Player>.Filter.And(
+            filter,
+            Builders<Player>.Filter.ElemMatch(
+                p => p.Matches,
+                m => m.BattleId == player.Match.BattleId)
+        );
+        
+        var battleIdExists = await collection.Find(battleIdExistsFilter).AnyAsync();
 
         var update = Builders<Player>.Update
             .Set(p => p.Power, player.Power)
             .Set(p => p.Rank, player.Rank)
-            .AddToSet(p => p.Names, player.Name)
-            .Push(p => p.Matches, player.Match);
+            .AddToSet(p => p.Names, player.Name);
 
+        if (!battleIdExists)
+        {
+            update = update.Push(p => p.Matches, player.Match);
+        }
+        
         await collection.UpdateOneAsync(filter, update, new UpdateOptions { IsUpsert = true });
     }
 
