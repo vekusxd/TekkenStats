@@ -1,4 +1,6 @@
-﻿using MongoDB.Driver;
+﻿using Microsoft.Extensions.DependencyInjection;
+using MongoDB.Driver;
+using TekkenStats.Core.Entities;
 
 namespace TekkenStats.DataAccess;
 
@@ -14,4 +16,16 @@ public class MongoDatabase
     }
     
     public IMongoDatabase Db => _mongoClient.GetDatabase(_dbName);
+    
+    public  async Task InitIndexes()
+    {
+        var collection = Db.GetCollection<Player>(Player.CollectionName);
+
+        var matchDateIndexDefinition = Builders<Player>.IndexKeys
+            .Descending("Matches.Date");
+
+        var idIndexModel = new CreateIndexModel<Player>(matchDateIndexDefinition);
+
+        await collection.Indexes.CreateOneAsync(idIndexModel);
+    }
 }

@@ -1,15 +1,15 @@
-﻿using MassTransit;
+using System.Net.Http.Json;
+using MassTransit;
 using TekkenStats.Core.Contracts;
-using TekkenStats.Core.Entities;
 
-namespace TekkenStats.API.Features.DataFetcher;
+namespace TekkenStats.CollectorService;
 
-public class DataFetcher : BackgroundService
+public class CollectorService : BackgroundService
 {
-    private readonly ILogger<DataFetcher> _logger;
+    private readonly ILogger<CollectorService> _logger;
     private readonly IServiceProvider _serviceProvider;
 
-    public DataFetcher(ILogger<DataFetcher> logger, IServiceProvider serviceProvider)
+    public CollectorService(ILogger<CollectorService> logger, IServiceProvider serviceProvider)
     {
         _logger = logger;
         _serviceProvider = serviceProvider;

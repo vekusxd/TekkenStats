@@ -1,8 +1,8 @@
 ﻿namespace TekkenStats.Core.Entities;
 
-public class PlayerInfo
+public class ChallengerInfo
 {
-    public PlayerInfo(int characterId, int ratingBefore, int ratingChange, int rounds)
+    public ChallengerInfo(int characterId, int ratingBefore, int ratingChange, int rounds)
     {
         CharacterId = characterId;
         RatingBefore = ratingBefore;

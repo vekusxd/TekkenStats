@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using TekkenStats.Core.Entities;
@@ -18,7 +19,8 @@ public class GetPlayerProfile : IEndpoint
     private async Task<Results<Ok<GetPlayerProfileResponse>, NotFound, ValidationProblem>> Handler(
         [AsParameters] GetPlayerProfileRequest request,
         IValidator<GetPlayerProfileRequest> validator,
-        MongoDatabase database
+        MongoDatabase database,
+        IMemoryCache cache
     )
     {
         var validationResult = await validator.ValidateAsync(request);
@@ -30,7 +32,7 @@ public class GetPlayerProfile : IEndpoint
 
         var player = await collection.Aggregate()
             .Match(p => p.TekkenId == request.TekkenId)
-            .Project<GetPlayerProfileResponse>(new BsonDocument
+            .Project<GetPlayerProfileProjection>(new BsonDocument
             {
                 { "_id", 0 },
                 { "Power", 1 },
@@ -58,25 +60,56 @@ public class GetPlayerProfile : IEndpoint
                             }))
                 }
             })
-            .AppendStage<GetPlayerProfileResponse>(new BsonDocument("$addFields",
-                new BsonDocument("LossCount",
-                    new BsonDocument("$subtract", new BsonArray { "$MatchesCount", "$WinCount" }))))
+            .AppendStage<GetPlayerProfileProjection>(new BsonDocument("$addFields",
+                new BsonDocument
+                {
+                    { "LossCount", new BsonDocument("$subtract", new BsonArray { "$MatchesCount", "$WinCount" }) },
+                    {
+                        "Characters",
+                        new BsonDocument("$sortArray",
+                            new BsonDocument
+                            {
+                                { "input", "$Characters" },
+                                { "sortBy", new BsonDocument("MatchesCount", -1) }
+                            })
+                    }
+                }))
             .SingleOrDefaultAsync();
 
         if (player == null)
             return TypedResults.NotFound();
 
-        return TypedResults.Ok(player);
+        var result = new GetPlayerProfileResponse
+        {
+            CurrentName = player.CurrentName,
+            LossCount = player.LossCount,
+            WinCount = player.WinCount,
+            MatchesCount = player.MatchesCount,
+            Names = player.Names,
+            Power = player.Power,
+            Characters = player.Characters.Select(c => new CharacterResponse
+            {
+                CharacterId = c.CharacterId,
+                CharacterName = cache.Get<string>(c.CharacterId) ??
+                                throw new NullReferenceException($"Character with id: {c.CharacterId} not found"),
+                MatchesCount = c.MatchesCount,
+                WinCount = c.WinCount,
+                LossCount = c.LossCount,
+                Rating = c.Rating,
+                LastPlayed = c.LastPlayed
+            }).ToList(),
+        };
+
+        return TypedResults.Ok(result);
     }
 }
 
 public class GetPlayerProfileRequest
 {
-    [FromRoute]
-    public required string TekkenId { get; set; }
+    [FromRoute] public required string TekkenId { get; set; }
 }
 
-public class GetPlayerProfileResponse
+public class GetPlayerProfileProjection
 {
     public required string CurrentName { get; init; }
     public long Power { get; set; }
@@ -85,4 +118,26 @@ public class GetPlayerProfileResponse
     public int LossCount { get; set; }
     public List<CharacterInfo> Characters { get; init; } = [];
     public List<Name> Names { get; set; } = [];
+}
+
+public class GetPlayerProfileResponse
+{
+    public required string CurrentName { get; init; }
+    public long Power { get; init; }
+    public int MatchesCount { get; init; }
+    public int WinCount { get; init; }
+    public int LossCount { get; init; }
+    public List<CharacterResponse> Characters { get; init; } = [];
+    public List<Name> Names { get; init; } = [];
+}
+
+public class CharacterResponse
+{
+    public required int CharacterId { get; init; }
+    public required string CharacterName { get; init; }
+    public int MatchesCount { get; set; }
+    public int WinCount { get; set; }
+    public int LossCount { get; set; }
+    public int Rating { get; set; }
+    public DateTime LastPlayed { get; set; }
 }

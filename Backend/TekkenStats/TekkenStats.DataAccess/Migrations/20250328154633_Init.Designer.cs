@@ -12,7 +12,7 @@ using TekkenStats.DataAccess;
 namespace TekkenStats.DataAccess.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250327111041_Init")]
+    [Migration("20250328154633_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -28,10 +28,7 @@ namespace TekkenStats.DataAccess.Migrations
             modelBuilder.Entity("TekkenStats.Core.Entities.Character", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Abbreviation")
                         .IsRequired()

@@ -6,17 +6,11 @@
       - "8080:8080"
     environment:
       ConnectionStrings__DefaultConnection: "Server=postgres;Port=5432;Database=tekkenstatsDb;User Id=postgres;Password=root;Include Error Detail=true"
-      RabbitMQOptions__Host: "rabbit"
-      RabbitMQOptions__Username: "guest"
-      RabbitMQOptions__Password: "guest"
       MongoOptions__ConnectionString: "mongodb://admin:root@mongo:27017"
       MongoOptions__DbName: "TekkenStats"
     build:
       context: .
       dockerfile: TekkenStats.API/Dockerfile
-    depends_on:
-      rabbit:
-        condition: service_healthy
     networks:
       - app-network
 
@@ -37,9 +31,25 @@
         condition: service_healthy
     networks:
       - app-network
+  
+  tekkenstats_collectorService:
+    image: tekkenstats_collector_service
+    container_name: tekkenstats_collector_service
+    environment:
+      RabbitMQOptions__Host: "rabbit"
+      RabbitMQOptions__Username: "guest"
+      RabbitMQOptions__Password: "guest"
+    build:
+      context: .
+      dockerfile: TekkenStats.CollectorService/Dockerfile
+    depends_on:
+      rabbit:
+        condition: service_healthy
+    networks:
+      - app-network
 
   postgres:
-    container_name: tekkenstats_db
+    container_name: tekkenstats_postgres_db
     image: postgres
     restart: always
     environment:

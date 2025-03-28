@@ -46,7 +46,8 @@ var host = builder.Build();
 
 using (var scope = host.Services.CreateScope())
 {
-    await scope.ServiceProvider.InitIndexes();
+    var mongoDb = scope.ServiceProvider.GetRequiredService<MongoDatabase>();
+    await mongoDb.InitIndexes();
     var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     dbContext.Database.Migrate();
 }

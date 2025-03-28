@@ -19,13 +19,13 @@ public class ResponseProcessor
     {
         var date = DateTimeOffset.FromUnixTimeSeconds(response.BattleAt).DateTime;
 
-        var firstPlayerInfo = new PlayerInfo(
+        var firstPlayerInfo = new ChallengerInfo(
             characterId: response.P1CharaId,
             ratingBefore: response.P1RatingBefore ?? 0,
             ratingChange: response.P1RatingChange ?? 0,
             rounds: response.P1Rounds);
 
-        var secondPlayerInfo = new PlayerInfo(
+        var secondPlayerInfo = new ChallengerInfo(
             characterId: response.P2CharaId,
             ratingBefore: response.P2RatingBefore ?? 0,
             ratingChange: response.P2RatingChange ?? 0,

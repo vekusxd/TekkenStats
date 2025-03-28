@@ -1,8 +1,8 @@
 ﻿namespace TekkenStats.Core.Entities;
 
-public class OpponentInfo : PlayerInfo
+public class OpponentInfo : ChallengerInfo
 {
-    public OpponentInfo(PlayerInfo playerInfo, string tekkenId) : base(playerInfo.CharacterId, playerInfo.RatingBefore, playerInfo.RatingChange, playerInfo.Rounds)
+    public OpponentInfo(ChallengerInfo challengerInfo, string tekkenId) : base(challengerInfo.CharacterId, challengerInfo.RatingBefore, challengerInfo.RatingChange, challengerInfo.Rounds)
     {
         TekkenId = tekkenId;
     }

@@ -25,10 +25,7 @@ namespace TekkenStats.DataAccess.Migrations
             modelBuilder.Entity("TekkenStats.Core.Entities.Character", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Abbreviation")
                         .IsRequired()
