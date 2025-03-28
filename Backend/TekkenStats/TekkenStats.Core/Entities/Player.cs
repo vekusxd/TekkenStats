@@ -11,10 +11,5 @@ public class Player
     public long Rank { get; set; }
     public List<Name> Names { get; set; } = [];
     public List<Match> Matches { get; set; } = [];
-}
-
-public class Name
-{
-    public required string PlayerName { get; init; }
-    public DateTime Date { get; init; } = DateTime.UtcNow;
+    public List<CharacterInfo> Characters { get; set; } = [];
 }

@@ -104,6 +104,42 @@ public class ResponseProcessor
             update = update.Push(p => p.Matches, player.Match);
         }
 
+        var characterExists =
+            existingPlayer?.Characters?.Any(c => c.CharacterId == player.Match.Challenger.CharacterId) ?? false;
+
+        if (!battleIdExists)
+        {
+            if (characterExists)
+            {
+                var characterFilter = filter & Builders<Player>.Filter.ElemMatch(
+                    p => p.Characters,
+                    c => c.CharacterId == player.Match.Challenger.CharacterId
+                );
+                var characterUpdate = Builders<Player>.Update
+                    .Inc("Characters.$.MatchesCount", 1)
+                    .Inc("Characters.$.WinCount", player.Match.Winner ? 1 : 0)
+                    .Inc("Characters.$.LossCount", player.Match.Winner ? 0 : 1)
+                    .Set("Characters.$.Rating",
+                        player.Match.Challenger.RatingBefore +
+                        player.Match.Challenger.RatingChange)
+                    .Set("Characters.$.LastPlayed", player.Match.Date);
+                await collection.UpdateOneAsync(characterFilter, characterUpdate);
+            }
+            else
+            {
+                var characterInfo = new CharacterInfo
+                {
+                    CharacterId = player.Match.Challenger.CharacterId,
+                    MatchesCount = 1,
+                    WinCount = player.Match.Winner ? 1 : 0,
+                    LossCount = player.Match.Winner ? 0 : 1,
+                    Rating = player.Match.Challenger.RatingBefore + player.Match.Challenger.RatingChange,
+                    LastPlayed = player.Match.Date
+                };
+                update = update.Push(p => p.Characters, characterInfo);
+            }
+        }
+
         await collection.UpdateOneAsync(filter, update, new UpdateOptions { IsUpsert = true });
     }
 
