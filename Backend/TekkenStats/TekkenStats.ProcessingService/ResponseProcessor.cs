@@ -4,7 +4,7 @@ using TekkenStats.Core.Entities;
 using TekkenStats.DataAccess;
 using Player = TekkenStats.Core.Entities.Player;
 
-namespace TekkenStats.Seeder;
+namespace TekkenStats.ProcessingService;
 
 public class ResponseProcessor
 {
@@ -88,9 +88,12 @@ public class ResponseProcessor
 
         var battleIdExists = await collection.Find(battleIdExistsFilter).AnyAsync();
 
+        if (battleIdExists) return;
+
         var update = Builders<Player>.Update
             .Set(p => p.Power, player.Power)
-            .Set(p => p.Rank, player.Rank);
+            .Set(p => p.Rank, player.Rank)
+            .Push(p => p.Matches, player.Match);
 
         if (existingPlayer == null || existingPlayer.CurrentName != player.Name)
         {
@@ -99,45 +102,43 @@ public class ResponseProcessor
                 .Push(p => p.Names, new Name { PlayerName = player.Name, Date = DateTime.UtcNow });
         }
 
-        if (!battleIdExists)
-        {
-            update = update.Push(p => p.Matches, player.Match);
-        }
-
         var characterExists =
             existingPlayer?.Characters?.Any(c => c.CharacterId == player.Match.Challenger.CharacterId) ?? false;
 
-        if (!battleIdExists)
+        if (characterExists)
         {
-            if (characterExists)
+            var characterFilter = filter & Builders<Player>.Filter.ElemMatch(
+                p => p.Characters,
+                c => c.CharacterId == player.Match.Challenger.CharacterId
+            );
+            var characterUpdate = Builders<Player>.Update
+                .Inc("Characters.$.MatchesCount", 1)
+                .Inc("Characters.$.WinCount", player.Match.Winner ? 1 : 0)
+                .Inc("Characters.$.LossCount", player.Match.Winner ? 0 : 1)
+                .Set("Characters.$.LastPlayed", player.Match.Date);
+
+
+            if (player.Match.Challenger.RatingBefore != 0)
             {
-                var characterFilter = filter & Builders<Player>.Filter.ElemMatch(
-                    p => p.Characters,
-                    c => c.CharacterId == player.Match.Challenger.CharacterId
-                );
-                var characterUpdate = Builders<Player>.Update
-                    .Inc("Characters.$.MatchesCount", 1)
-                    .Inc("Characters.$.WinCount", player.Match.Winner ? 1 : 0)
-                    .Inc("Characters.$.LossCount", player.Match.Winner ? 0 : 1)
-                    .Set("Characters.$.Rating",
-                        player.Match.Challenger.RatingBefore +
-                        player.Match.Challenger.RatingChange)
-                    .Set("Characters.$.LastPlayed", player.Match.Date);
-                await collection.UpdateOneAsync(characterFilter, characterUpdate);
+                characterUpdate = characterUpdate.Set("Characters.$.Rating",
+                    player.Match.Challenger.RatingBefore +
+                    player.Match.Challenger.RatingChange);
             }
-            else
+
+            await collection.UpdateOneAsync(characterFilter, characterUpdate);
+        }
+        else
+        {
+            var characterInfo = new CharacterInfo
             {
-                var characterInfo = new CharacterInfo
-                {
-                    CharacterId = player.Match.Challenger.CharacterId,
-                    MatchesCount = 1,
-                    WinCount = player.Match.Winner ? 1 : 0,
-                    LossCount = player.Match.Winner ? 0 : 1,
-                    Rating = player.Match.Challenger.RatingBefore + player.Match.Challenger.RatingChange,
-                    LastPlayed = player.Match.Date
-                };
-                update = update.Push(p => p.Characters, characterInfo);
-            }
+                CharacterId = player.Match.Challenger.CharacterId,
+                MatchesCount = 1,
+                WinCount = player.Match.Winner ? 1 : 0,
+                LossCount = player.Match.Winner ? 0 : 1,
+                Rating = player.Match.Challenger.RatingBefore + player.Match.Challenger.RatingChange,
+                LastPlayed = player.Match.Date
+            };
+            update = update.Push(p => p.Characters, characterInfo);
         }
 
         await collection.UpdateOneAsync(filter, update, new UpdateOptions { IsUpsert = true });

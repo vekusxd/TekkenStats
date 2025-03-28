@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using TekkenStats.Core.Options;
 using TekkenStats.DataAccess;
 using TekkenStats.DataAccess.Extensions;
-using TekkenStats.Seeder;
+using TekkenStats.ProcessingService;
 
 var builder = Host.CreateApplicationBuilder(args);
 

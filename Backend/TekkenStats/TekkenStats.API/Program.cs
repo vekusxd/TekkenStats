@@ -69,11 +69,8 @@ using (var scope = app.Services.CreateScope())
     await seeder.SeedDb();
 }
 
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-    app.MapScalarApiReference();
-}
+app.MapOpenApi();
+app.MapScalarApiReference();
 
 app.UseHttpsRedirection();
 

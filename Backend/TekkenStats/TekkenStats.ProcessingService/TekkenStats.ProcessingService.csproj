@@ -5,7 +5,6 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <UserSecretsId>dotnet-TekkenStats.Seeder-a6c97c13-fa4d-49c0-8cd3-a9685640e16f</UserSecretsId>
-        <RootNamespace>TekkenStats.Seeder</RootNamespace>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     </PropertyGroup>
 

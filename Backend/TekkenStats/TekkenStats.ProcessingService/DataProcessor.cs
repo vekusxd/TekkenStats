@@ -4,7 +4,7 @@ using TekkenStats.Core.Contracts;
 using TekkenStats.Core.Entities;
 using TekkenStats.DataAccess;
 
-namespace TekkenStats.Seeder;
+namespace TekkenStats.ProcessingService;
 
 public class DataProcessor : IConsumer<DataMessage>
 {

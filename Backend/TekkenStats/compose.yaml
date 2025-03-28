@@ -2,6 +2,8 @@
   tekkenstats_api:
     container_name: tekkenstats_api
     image: tekkenstats_api
+    ports:
+      - "8080:8080"
     environment:
       ConnectionStrings__DefaultConnection: "Server=postgres;Port=5432;Database=tekkenstatsDb;User Id=postgres;Password=root;Include Error Detail=true"
       RabbitMQOptions__Host: "rabbit"
