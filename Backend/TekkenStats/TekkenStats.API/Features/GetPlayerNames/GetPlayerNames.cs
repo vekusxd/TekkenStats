@@ -7,9 +7,9 @@ using MongoDB.Driver;
 using TekkenStats.Core.Entities;
 using TekkenStats.DataAccess;
 
-namespace TekkenStats.API.Features.GetNames;
+namespace TekkenStats.API.Features.GetPlayerNames;
 
-public class GetNames : IEndpoint
+public class GetPlayerNames : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
@@ -23,9 +23,7 @@ public class GetNames : IEndpoint
     {
         var validation = await validator.ValidateAsync(request);
         if (!validation.IsValid)
-        {
             return TypedResults.ValidationProblem(validation.ToDictionary());
-        }
 
         var collection = database.Db.GetCollection<Player>(Player.CollectionName);
 
