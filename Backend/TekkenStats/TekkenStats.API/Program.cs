@@ -81,6 +81,8 @@ app.UseStaticFiles();
 
 app.UseCors();
 
-app.MapEndpoints();
+var apiGroup = app.MapGroup("/api");
+
+app.MapEndpoints(apiGroup);
 
 app.Run();
