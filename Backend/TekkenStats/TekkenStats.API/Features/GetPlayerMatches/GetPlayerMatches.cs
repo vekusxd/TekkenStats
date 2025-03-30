@@ -33,8 +33,12 @@ public class GetPlayerMatches : IEndpoint
         var pageSize = request.PageSize ?? 10;
         var skip = (pageNumber - 1) * pageSize;
 
-        var player = await collection.Aggregate()
-            .Match(p => p.TekkenId == request.TekkenId)
+        var pipeline = collection.Aggregate()
+            .Match(p => p.TekkenId == request.TekkenId);
+
+        var matchesFilter = BuildMatchesFilter(request.CharacterId, request.OpponentCharacterId);
+
+        var player = await pipeline
             .Project<PlayerMatchesProjection>(new BsonDocument
             {
                 { "_id", 0 },
@@ -49,7 +53,22 @@ public class GetPlayerMatches : IEndpoint
                                     {
                                         "$sortArray", new BsonDocument
                                         {
-                                            { "input", "$Matches" },
+                                            {
+                                                "input",
+                                                matchesFilter != null
+                                                    ? new BsonDocument
+                                                    {
+                                                        {
+                                                            "$filter", new BsonDocument
+                                                            {
+                                                                { "input", "$Matches" },
+                                                                { "as", "match" },
+                                                                { "cond", matchesFilter }
+                                                            }
+                                                        }
+                                                    }
+                                                    : "$Matches"
+                                            },
                                             { "sortBy", new BsonDocument("Date", -1) }
                                         }
                                     }
@@ -60,7 +79,28 @@ public class GetPlayerMatches : IEndpoint
                         }
                     }
                 },
-                { "TotalMatches", new BsonDocument("$size", "$Matches") }
+                {
+                    "TotalMatches",
+                    matchesFilter != null
+                        ? new BsonDocument
+                        {
+                            {
+                                "$size",
+                                new BsonDocument
+                                {
+                                    {
+                                        "$filter", new BsonDocument
+                                        {
+                                            { "input", "$Matches" },
+                                            { "as", "match" },
+                                            { "cond", matchesFilter }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        : new BsonDocument("$size", "$Matches")
+                }
             })
             .SingleOrDefaultAsync();
 
@@ -78,17 +118,20 @@ public class GetPlayerMatches : IEndpoint
                 GameVersion = m.GameVersion,
                 Challenger = new ChallengerInfoResponse
                 {
+                    TekkenId = m.Challenger.TekkenId,
+                    Name = m.Challenger.Name,
                     CharacterId = m.Challenger.CharacterId,
                     CharacterName = cache.Get<string>(m.Challenger.CharacterId) ??
                                     throw new NullReferenceException(
                                         $"Character with id: {m.Challenger.CharacterId} not found"),
                     Rounds = m.Challenger.Rounds,
                     RatingBefore = m.Challenger.RatingBefore,
-                    RatingChange = m.Challenger.RatingChange
+                    RatingChange = m.Challenger.RatingChange,
                 },
-                Opponent = new OpponentInfoResponse
+                Opponent = new ChallengerInfoResponse
                 {
                     TekkenId = m.Opponent.TekkenId,
+                    Name = m.Opponent.Name,
                     CharacterId = m.Opponent.CharacterId,
                     CharacterName = cache.Get<string>(m.Opponent.CharacterId) ??
                                     throw new NullReferenceException(
@@ -101,6 +144,31 @@ public class GetPlayerMatches : IEndpoint
         };
         return TypedResults.Ok(result);
     }
+
+    private BsonDocument? BuildMatchesFilter(int? characterId, int? opponentCharacterId)
+    {
+        var conditions = new BsonArray();
+
+        if (characterId.HasValue)
+        {
+            conditions.Add(new BsonDocument(
+                "$eq",
+                new BsonArray { "$$match.Challenger.CharacterId", characterId.Value }
+            ));
+        }
+
+        if (opponentCharacterId.HasValue)
+        {
+            conditions.Add(new BsonDocument(
+                "$eq",
+                new BsonArray { "$$match.Opponent.CharacterId", opponentCharacterId.Value }
+            ));
+        }
+
+        return conditions.Count > 0
+            ? new BsonDocument("$and", conditions)
+            : null;
+    }
 }
 
 public class GetPlayerMatchesRequest
@@ -109,6 +177,8 @@ public class GetPlayerMatchesRequest
 
     [FromQuery] public int? PageSize { get; set; } = 10;
     [FromQuery] public int? PageNumber { get; set; } = 1;
+    [FromQuery] public int? CharacterId { get; init; }
+    [FromQuery] public int? OpponentCharacterId { get; init; }
 }
 
 public class PlayerMatchesProjection
@@ -130,22 +200,14 @@ public class MatchResponse
     public long GameVersion { get; init; }
     public bool Winner { get; init; }
     public required ChallengerInfoResponse Challenger { get; init; }
-    public required OpponentInfoResponse Opponent { get; init; }
+    public required ChallengerInfoResponse Opponent { get; init; }
 }
 
 public class ChallengerInfoResponse
 {
     public int CharacterId { get; init; }
-    public required string CharacterName { get; init; }
-    public int Rounds { get; init; }
-    public int RatingBefore { get; init; }
-    public int RatingChange { get; init; }
-}
-
-public class OpponentInfoResponse
-{
-    public int CharacterId { get; init; }
     public required string TekkenId { get; init; }
+    public required string Name { get; init; }
     public required string CharacterName { get; init; }
     public int Rounds { get; init; }
     public int RatingBefore { get; init; }

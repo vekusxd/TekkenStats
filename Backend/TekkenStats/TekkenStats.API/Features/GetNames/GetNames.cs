@@ -7,9 +7,9 @@ using MongoDB.Driver;
 using TekkenStats.Core.Entities;
 using TekkenStats.DataAccess;
 
-namespace TekkenStats.API.Features.GetPlayerNames;
+namespace TekkenStats.API.Features.GetNames;
 
-public class GetPlayerNames : IEndpoint
+public class GetNames : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
