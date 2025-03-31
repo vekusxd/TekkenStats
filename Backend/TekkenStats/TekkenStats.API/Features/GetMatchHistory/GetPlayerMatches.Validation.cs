@@ -1,9 +1,8 @@
 ﻿using FluentValidation;
 
+namespace TekkenStats.API.Features.GetMatchHistory;
 
-namespace TekkenStats.API.Features.GetPlayerMatches;
-
-public class GetPlayerMatchesValidator : AbstractValidator<GetPlayerMatchesRequest>
+public class GetPlayerMatchesValidator : AbstractValidator<GetPlayerMatchHistoryRequest>
 {
     public GetPlayerMatchesValidator()
     {

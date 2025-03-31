@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 using TekkenStats.API.Extensions;
 using TekkenStats.API.Features.Seeder;
+using TekkenStats.API.Features.Shared;
 using TekkenStats.Core.Options;
 using TekkenStats.DataAccess;
 using TekkenStats.DataAccess.Extensions;
@@ -19,6 +20,7 @@ builder.Services.AddScoped<Seeder>();
 builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
 builder.Services.AddMongoDb(builder.Configuration);
 builder.Services.AddMemoryCache();
+builder.Services.AddScoped<CharacterStore>();
 
 builder.Services.AddCors(opts =>
     opts.AddDefaultPolicy(policyBuilder => policyBuilder

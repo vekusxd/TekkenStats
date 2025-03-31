@@ -7,7 +7,7 @@ using MongoDB.Driver;
 using TekkenStats.Core.Entities;
 using TekkenStats.DataAccess;
 
-namespace TekkenStats.API.Features.GetPlayerMatches;
+namespace TekkenStats.API.Features.GetMatchHistory;
 
 public class GetPlayerMatches : IEndpoint
 {
@@ -16,9 +16,9 @@ public class GetPlayerMatches : IEndpoint
         app.MapGet("/matches/{tekkenId}", Handler);
     }
 
-    private async Task<Results<Ok<GetPlayerMatchesResponse>, NotFound, ValidationProblem>> Handler(
-        [AsParameters] GetPlayerMatchesRequest request,
-        IValidator<GetPlayerMatchesRequest> validator,
+    private async Task<Results<Ok<GetMatchHistoryResponse>, NotFound, ValidationProblem>> Handler(
+        [AsParameters] GetPlayerMatchHistoryRequest request,
+        IValidator<GetPlayerMatchHistoryRequest> validator,
         MongoDatabase db,
         IMemoryCache cache)
     {
@@ -107,7 +107,7 @@ public class GetPlayerMatches : IEndpoint
         if (player == null)
             return TypedResults.NotFound();
 
-        var result = new GetPlayerMatchesResponse
+        var result = new GetMatchHistoryResponse
         {
             TotalMatches = player.TotalMatches,
             Matches = player.Matches.Select(m => new MatchResponse
@@ -171,7 +171,7 @@ public class GetPlayerMatches : IEndpoint
     }
 }
 
-public class GetPlayerMatchesRequest
+public class GetPlayerMatchHistoryRequest
 {
     [FromRoute] public required string TekkenId { get; set; }
 
@@ -187,7 +187,7 @@ public class PlayerMatchesProjection
     public int TotalMatches { get; set; }
 }
 
-public class GetPlayerMatchesResponse
+public class GetMatchHistoryResponse
 {
     public List<MatchResponse> Matches { get; set; } = [];
     public int TotalMatches { get; set; }
