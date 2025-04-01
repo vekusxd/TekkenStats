@@ -81,6 +81,7 @@ public class GetPlayerProfile : IEndpoint
 
         var result = new GetPlayerProfileResponse
         {
+            TekkenId = request.TekkenId,
             CurrentName = player.CurrentName,
             LossCount = player.LossCount,
             WinCount = player.WinCount,
@@ -122,6 +123,7 @@ public class GetPlayerProfileProjection
 
 public class GetPlayerProfileResponse
 {
+    public required string TekkenId { get; init; }
     public required string CurrentName { get; init; }
     public long Power { get; init; }
     public int MatchesCount { get; init; }
@@ -140,4 +142,5 @@ public class CharacterResponse
     public int LossCount { get; set; }
     public int Rating { get; set; }
     public DateTime LastPlayed { get; set; }
+    public double WinRate => Math.Round((double)WinCount / MatchesCount, 2) * 100;
 }

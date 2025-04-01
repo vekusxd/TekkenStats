@@ -19,17 +19,25 @@ public class ResponseProcessor
     {
         var date = DateTimeOffset.FromUnixTimeSeconds(response.BattleAt).DateTime;
 
-        var firstPlayerInfo = new ChallengerInfo(
-            characterId: response.P1CharaId,
-            ratingBefore: response.P1RatingBefore ?? 0,
-            ratingChange: response.P1RatingChange ?? 0,
-            rounds: response.P1Rounds);
+        var firstPlayerInfo = new ChallengerInfo
+        {
+            CharacterId = response.P1CharaId,
+            RatingBefore = response.P1RatingBefore ?? 0,
+            RatingChange = response.P1RatingChange ?? 0,
+            Rounds = response.P1Rounds,
+            Name = response.P1Name,
+            TekkenId = response.P1PolarisId
+        };
 
-        var secondPlayerInfo = new ChallengerInfo(
-            characterId: response.P2CharaId,
-            ratingBefore: response.P2RatingBefore ?? 0,
-            ratingChange: response.P2RatingChange ?? 0,
-            rounds: response.P2Rounds);
+        var secondPlayerInfo = new ChallengerInfo
+        {
+            CharacterId = response.P2CharaId,
+            RatingBefore = response.P2RatingBefore ?? 0,
+            RatingChange = response.P2RatingChange ?? 0,
+            Rounds = response.P2Rounds,
+            Name = response.P2Name,
+            TekkenId = response.P2PolarisId
+        };
 
         var firstPlayerMatch = new Match
         {
@@ -38,7 +46,7 @@ public class ResponseProcessor
             GameVersion = response.GameVersion,
             Winner = response.Winner == 1,
             Challenger = firstPlayerInfo,
-            Opponent = new OpponentInfo(secondPlayerInfo, response.P2PolarisId)
+            Opponent = secondPlayerInfo,
         };
 
         var secondPlayerMatch = new Match
@@ -48,7 +56,7 @@ public class ResponseProcessor
             GameVersion = response.GameVersion,
             Winner = response.Winner == 2,
             Challenger = secondPlayerInfo,
-            Opponent = new OpponentInfo(firstPlayerInfo, response.P1PolarisId)
+            Opponent = firstPlayerInfo
         };
 
         var firstPlayerUpdate = UpdatePlayer(new PlayerUpdate

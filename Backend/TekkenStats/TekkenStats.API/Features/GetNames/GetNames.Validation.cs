@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace TekkenStats.API.Features.GetPlayerNames;
+namespace TekkenStats.API.Features.GetNames;
 
 public class GetNamesValidator : AbstractValidator<GetNamesRequest>
 {

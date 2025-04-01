@@ -1,0 +1,100 @@
+@startuml SystemClasses
+
+left to right direction
+
+class Player {
+    - tekkenId: string
+    - currentName: string
+    - power: long
+    - rank: long
+    - names: list<Name>
+    - characters: list<CharacterInfo>
+}
+
+
+class Name {
+    - playerName: string
+    - date: dateTime
+}
+
+class ProcessedMessage {
+    - id: uuid
+    - messageId: uuid
+}
+
+class CharacterInfo {
+    - characterId: int
+    - matchesCount: int
+    - winCount: int
+    - lossCount: int
+    - rating: int
+    - lastPlayed: dateTime
+}
+
+class Match {
+    - battleId: string
+    - date: dateTime
+    - gameVersion: long
+    - winner: boolean
+    - challenger: ChallengerInfo
+    - opponent: ChallengerInfo
+}
+
+class ChallengerInfo {
+    - characterId: int
+    - rounds: int
+    - ratingBefore: int
+    - ratingChange: int
+    - tekkenId: string
+    - name: string
+}
+
+class Character {
+    - id: int
+    - name: string
+    - abbreviation: string
+}
+
+class WavuWankResponse {
+    - BattleAt: int
+    - BattleId: string
+    - BattleType: int 
+    - GameVersion: long 
+    - P1AreaId: int 
+    - P1CharaId: int 
+    - P1Lang: string 
+    - P1Name: string 
+    - P1PolarisId: string 
+    - P1Power: long 
+    - P1Rank: long 
+    - P1RatingBefore: int
+    - P1RatingChange: int 
+    - P1RegionId: int 
+    - P1Rounds: int 
+    - P1UserId: string 
+    - P2AreaId: int 
+    - P2CharaId: int 
+    - P2Lang: string 
+    - P2Name: string 
+    - P2PolarisId: string 
+    - P2Power: long 
+    - P2Rank: long 
+    - P2RatingBefore: int
+    - P2RatingChange: int 
+    - P2RegionId: int 
+    - P2Rounds: int 
+    - P2UserId: string 
+    - StageId: int 
+    - Winner: int 
+
+}
+
+Character "1" -- "*" CharacterInfo
+Player "1" -- "*" Name
+Player "1" -- "*" CharacterInfo
+Match "1" -- "1" ChallengerInfo
+ChallengerInfo "1" -- "1" Character
+ChallengerInfo "1" -- "1" Player
+
+
+@enduml
