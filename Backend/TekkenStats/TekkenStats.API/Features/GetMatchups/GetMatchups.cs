@@ -70,7 +70,8 @@ public class GetMatchups : IEndpoint
             Wins = c.Wins,
             Losses = c.Losses,
             TotalMatches = c.TotalMatches,
-            CharacterName = characterStore.GetCharacter(c.OpponentCharacterId).Name
+            CharacterName = characterStore.GetCharacter(c.OpponentCharacterId).Name,
+            CharacterImgURL = characterStore.GetCharacter(c.OpponentCharacterId).ImgURL
         }).ToList());
     }
 }
@@ -87,6 +88,7 @@ public class MatchupsResponse
 {
     public int OpponentCharacterId { get; init; }
     public required string CharacterName { get; init; }
+    public required string CharacterImgURL { get; init; }
     public int TotalMatches { get; init; }
     public int Wins { get; init; }
     public int Losses { get; init; }
