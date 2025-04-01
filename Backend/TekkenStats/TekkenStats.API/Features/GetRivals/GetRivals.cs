@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
+﻿using FluentValidation;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -15,13 +16,23 @@ public class GetRivals : IEndpoint
         app.MapGet("/rivals/{tekkenId}", Handler);
     }
 
-    private async Task<Results<Ok<List<RivalsResponse>>, NotFound>> Handler(
+    private async Task<Results<Ok<GetRivalsResponse>, NotFound, ValidationProblem>> Handler(
         string tekkenId,
-        [FromQuery] int? playerCharacterId,
-        [FromQuery] int? opponentCharacterId,
+        [AsParameters] GetRivalsRequest request,
+        IValidator<GetRivalsRequest> validator,
         MongoDatabase mongoDatabase,
         CharacterStore characterStore)
     {
+        request.PageNumber ??= 1;
+        request.PageSize ??= 10;
+        var skip = (request.PageNumber - 1) * request.PageSize;
+
+        var validationResult = await validator.ValidateAsync(request);
+
+        if (!validationResult.IsValid)
+            return TypedResults.ValidationProblem(validationResult.ToDictionary());
+
+
         var collection = mongoDatabase.Db.GetCollection<BsonDocument>(Player.CollectionName);
         var pipeline = new List<BsonDocument>
         {
@@ -31,14 +42,14 @@ public class GetRivals : IEndpoint
 
         var matchFilters = new BsonDocument();
 
-        if (playerCharacterId.HasValue)
+        if (request.PlayerCharacterId.HasValue)
         {
-            matchFilters.Add("Matches.Challenger.CharacterId", playerCharacterId.Value);
+            matchFilters.Add("Matches.Challenger.CharacterId", request.PlayerCharacterId.Value);
         }
 
-        if (opponentCharacterId.HasValue)
+        if (request.OpponentCharacterId.HasValue)
         {
-            matchFilters.Add("Matches.Opponent.CharacterId", opponentCharacterId.Value);
+            matchFilters.Add("Matches.Opponent.CharacterId", request.OpponentCharacterId.Value);
         }
 
         if (matchFilters.ElementCount > 0)
@@ -58,6 +69,18 @@ public class GetRivals : IEndpoint
         };
         pipeline.Add(new BsonDocument("$group", groupStage));
 
+        pipeline.Add(new BsonDocument("$sort", new BsonDocument("TotalMatches", -1)));
+
+        var countPipeline = new List<BsonDocument>(pipeline);
+        countPipeline.Add(new BsonDocument("$count", "totalCount"));
+
+        var countCursor = await collection.AggregateAsync<BsonDocument>(countPipeline);
+        var countResult = await countCursor.FirstOrDefaultAsync();
+        var totalCount = countResult?["totalCount"].AsInt32 ?? 0;
+
+        pipeline.Add(new BsonDocument("$skip", skip));
+        pipeline.Add(new BsonDocument("$limit", request.PageSize));
+
         var projectStage = new BsonDocument
         {
             { "_id", 0 },
@@ -69,7 +92,6 @@ public class GetRivals : IEndpoint
         };
         pipeline.Add(new BsonDocument("$project", projectStage));
 
-        pipeline.Add(new BsonDocument("$sort", new BsonDocument("TotalMatches", -1)));
 
         var cursor = await collection.AggregateAsync<PlayerOpponentStats>(pipeline);
         var result = await cursor.ToListAsync();
@@ -77,15 +99,35 @@ public class GetRivals : IEndpoint
         if (result == null)
             return TypedResults.NotFound();
 
-        return TypedResults.Ok(result.Select(c => new RivalsResponse
+        var data = result.Select(c => new Rival
         {
             TekkenId = c.TekkenId,
             Name = c.Name,
             Wins = c.Wins,
             Losses = c.Losses,
             TotalMatches = c.TotalMatches,
-        }).ToList());
+        }).ToList();
+
+        return TypedResults.Ok(new GetRivalsResponse
+        {
+            Data = data,
+            Count = totalCount
+        });
     }
+}
+
+public class GetRivalsRequest
+{
+    [FromQuery] public int? PlayerCharacterId { get; init; }
+    [FromQuery] public int? OpponentCharacterId { get; init; }
+    [FromQuery] public int? PageSize { get; set; }
+    [FromQuery] public int? PageNumber { get; set; }
+}
+
+public class GetRivalsResponse
+{
+    public required List<Rival> Data { get; init; }
+    public int Count { get; init; }
 }
 
 public class PlayerOpponentStats
@@ -97,7 +139,7 @@ public class PlayerOpponentStats
     public int TotalMatches { get; init; }
 }
 
-public class RivalsResponse
+public class Rival
 {
     public required string TekkenId { get; init; }
     public required string Name { get; init; }
