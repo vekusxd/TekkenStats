@@ -71,7 +71,7 @@ public class GetMatchups : IEndpoint
             Wins = c.Wins,
             Losses = c.Losses,
             TotalMatches = c.TotalMatches,
-            CharacterName = characterStore.GetCharacter(c.OpponentCharacterId)
+            CharacterName = characterStore.GetCharacter(c.OpponentCharacterId).Name
         }).ToList());
     }
 }

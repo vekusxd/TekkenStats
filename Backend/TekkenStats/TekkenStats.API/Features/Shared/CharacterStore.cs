@@ -13,8 +13,8 @@ public class CharacterStore
         _cache = cache;
     }
 
-    public string GetCharacter(int id)
+    public Character GetCharacter(int id)
     {
-        return _cache.Get<string>(id) ?? throw new Exception($"Character with id {id} not found");
+        return _cache.Get<Character>(id) ?? throw new Exception($"Character with id {id} not found");
     }
 }

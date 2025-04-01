@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using TekkenStats.API.Features.Shared;
 using TekkenStats.Core.Entities;
 using TekkenStats.DataAccess;
 
@@ -20,7 +21,7 @@ public class GetPlayerMatches : IEndpoint
         [AsParameters] GetPlayerMatchHistoryRequest request,
         IValidator<GetPlayerMatchHistoryRequest> validator,
         MongoDatabase db,
-        IMemoryCache cache)
+        CharacterStore characterStore)
     {
         var validationResult = await validator.ValidateAsync(request);
 
@@ -118,27 +119,25 @@ public class GetPlayerMatches : IEndpoint
                 GameVersion = m.GameVersion,
                 Challenger = new ChallengerInfoResponse
                 {
-                    TekkenId = m.Challenger.TekkenId,
+                    TekkenId = request.TekkenId,
                     Name = m.Challenger.Name,
                     CharacterId = m.Challenger.CharacterId,
-                    CharacterName = cache.Get<string>(m.Challenger.CharacterId) ??
-                                    throw new NullReferenceException(
-                                        $"Character with id: {m.Challenger.CharacterId} not found"),
+                    CharacterName = characterStore.GetCharacter(m.Challenger.CharacterId).Name,
                     Rounds = m.Challenger.Rounds,
                     RatingBefore = m.Challenger.RatingBefore,
                     RatingChange = m.Challenger.RatingChange,
+                    CharacterImgURL = characterStore.GetCharacter(m.Challenger.CharacterId).ImgURL
                 },
                 Opponent = new ChallengerInfoResponse
                 {
                     TekkenId = m.Opponent.TekkenId,
                     Name = m.Opponent.Name,
                     CharacterId = m.Opponent.CharacterId,
-                    CharacterName = cache.Get<string>(m.Opponent.CharacterId) ??
-                                    throw new NullReferenceException(
-                                        $"Character with id: {m.Opponent.CharacterId} not found"),
+                    CharacterName = characterStore.GetCharacter(m.Opponent.CharacterId).Name,
                     Rounds = m.Opponent.Rounds,
                     RatingBefore = m.Opponent.RatingBefore,
-                    RatingChange = m.Opponent.RatingChange
+                    RatingChange = m.Opponent.RatingChange,
+                    CharacterImgURL = characterStore.GetCharacter(m.Opponent.CharacterId).ImgURL,
                 }
             }).ToList(),
         };
@@ -209,6 +208,7 @@ public class ChallengerInfoResponse
     public required string TekkenId { get; init; }
     public required string Name { get; init; }
     public required string CharacterName { get; init; }
+    public required string CharacterImgURL { get; init; }
     public int Rounds { get; init; }
     public int RatingBefore { get; init; }
     public int RatingChange { get; init; }

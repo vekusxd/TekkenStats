@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using TekkenStats.API.Features.Shared;
 using TekkenStats.Core.Entities;
 using TekkenStats.DataAccess;
 
@@ -20,7 +21,7 @@ public class GetPlayerProfile : IEndpoint
         [AsParameters] GetPlayerProfileRequest request,
         IValidator<GetPlayerProfileRequest> validator,
         MongoDatabase database,
-        IMemoryCache cache
+        CharacterStore characterStore
     )
     {
         var validationResult = await validator.ValidateAsync(request);
@@ -91,13 +92,15 @@ public class GetPlayerProfile : IEndpoint
             Characters = player.Characters.Select(c => new CharacterResponse
             {
                 CharacterId = c.CharacterId,
-                CharacterName = cache.Get<string>(c.CharacterId) ??
+                CharacterName = characterStore.GetCharacter(c.CharacterId).Name ??
                                 throw new NullReferenceException($"Character with id: {c.CharacterId} not found"),
                 MatchesCount = c.MatchesCount,
                 WinCount = c.WinCount,
                 LossCount = c.LossCount,
                 Rating = c.Rating,
-                LastPlayed = c.LastPlayed
+                LastPlayed = c.LastPlayed,
+                ImgURL = characterStore.GetCharacter(c.CharacterId).ImgURL ??
+                         throw new Exception($"Character with id: {c.CharacterId} not found")
             }).ToList(),
         };
 
@@ -137,6 +140,7 @@ public class CharacterResponse
 {
     public required int CharacterId { get; init; }
     public required string CharacterName { get; init; }
+    public required string ImgURL { get; init; }
     public int MatchesCount { get; set; }
     public int WinCount { get; set; }
     public int LossCount { get; set; }

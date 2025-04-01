@@ -27,7 +27,7 @@ public class Seeder
         var characters = await _dbContext.Characters.ToListAsync();
         foreach (var character in characters)
         {
-            _memoryCache.Set(character.Id, character.Name, cacheEntryOptions);
+            _memoryCache.Set(character.Id, character, cacheEntryOptions);
         }
     }
 
@@ -52,7 +52,7 @@ public class Seeder
             {
                 Id = item.Id,
                 Name = item.Name,
-                Abbreviation = item.Abbreviation
+                ImgURL = item.ImgURL
             })
             .ToList();
 

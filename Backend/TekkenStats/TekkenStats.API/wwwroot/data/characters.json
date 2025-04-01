@@ -1,40 +1,187 @@
 [
-  { "Id": 0, "Name": "Paul", "Abbreviation": "GRF" },
-  { "Id": 1, "Name": "Law", "Abbreviation": "PIG" },
-  { "Id": 2, "Name": "King", "Abbreviation": "PGN" },
-  { "Id": 3, "Name": "Yoshimitsu", "Abbreviation": "CML" },
-  { "Id": 4, "Name": "Hwoarang", "Abbreviation": "SNK" },
-  { "Id": 5, "Name": "Ling Xiaoyu", "Abbreviation": "RAT" },
-  { "Id": 6, "Name": "Jin", "Abbreviation": "ANT" },
-  { "Id": 7, "Name": "Bryan", "Abbreviation": "CHT" },
-  { "Id": 8, "Name": "Kazuya", "Abbreviation": "GRL" },
-  { "Id": 9, "Name": "Steve", "Abbreviation": "BSN" },
-  { "Id": 10, "Name": "Jack-8", "Abbreviation": "CCN" },
-  { "Id": 11, "Name": "Asuka", "Abbreviation": "DER" },
-  { "Id": 12, "Name": "Devil Jin", "Abbreviation": "SWL" },
-  { "Id": 13, "Name": "Feng", "Abbreviation": "KLW" },
-  { "Id": 14, "Name": "Lili", "Abbreviation": "HMS" },
-  { "Id": 15, "Name": "Dragunov", "Abbreviation": "KMD" },
-  { "Id": 16, "Name": "Leo", "Abbreviation": "GHP" },
-  { "Id": 17, "Name": "Lars", "Abbreviation": "LZD" },
-  { "Id": 18, "Name": "Alisa", "Abbreviation": "MNT" },
-  { "Id": 19, "Name": "Claudio", "Abbreviation": "CTR" },
-  { "Id": 20, "Name": "Shaheen", "Abbreviation": "HRS" },
-  { "Id": 21, "Name": "Nina", "Abbreviation": "KAL" },
-  { "Id": 22, "Name": "Lee", "Abbreviation": "WLF" },
-  { "Id": 23, "Name": "Kuma", "Abbreviation": "RBT" },
-  { "Id": 24, "Name": "Panda", "Abbreviation": "TTR" },
-  { "Id": 27, "Name": "Jun", "Abbreviation": "AML" },
-  { "Id": 28, "Name": "Zafina", "Abbreviation": "CRW" },
-  { "Id": 29, "Name": "Leroy", "Abbreviation": "JLY" },
-  { "Id": 32, "Name": "Azazel", "Abbreviation": "GOT" },
-  { "Id": 33, "Name": "Reina", "Abbreviation": "ZBR" },
-  { "Id": 34, "Name": "Azucena", "Abbreviation": "CAT" },
-  { "Id": 35, "Name": "Victor", "Abbreviation": "LON" },
-  { "Id": 36, "Name": "Raven", "Abbreviation": "BBN" },
-  { "Id": 38, "Name": "Eddy", "Abbreviation": "DOG" },
-  { "Id": 39, "Name": "Lidia", "Abbreviation": "CBR" },
-  { "Id": 40, "Name": "Heihachi", "Abbreviation": "BEE" },
-  { "Id": 41, "Name": "Clive", "Abbreviation": "CLL" },
-  { "Id": 42, "Name": "Anna", "Abbreviation": "ANW" }
+  {
+    "Id": 0,
+    "Name": "Paul",
+    "ImgURL": "images/paul.png"
+  },
+  {
+    "Id": 1,
+    "Name": "Law",
+    "ImgURL": "images/law.png"
+  },
+  {
+    "Id": 2,
+    "Name": "King",
+    "ImgURL": "images/king.png"
+  },
+  {
+    "Id": 3,
+    "Name": "Yoshimitsu",
+    "ImgURL": "images/yoshi.png"
+  },
+  {
+    "Id": 4,
+    "Name": "Hwoarang",
+    "ImgURL": "images/hwo.png"
+  },
+  {
+    "Id": 5,
+    "Name": "Ling Xiaoyu",
+    "ImgURL": "images/xiaoyu.png"
+  },
+  {
+    "Id": 6,
+    "Name": "Jin",
+    "ImgURL": "images/jin.png"
+  },
+  {
+    "Id": 7,
+    "Name": "Bryan",
+    "ImgURL": "images/bryan.png"
+  },
+  {
+    "Id": 8,
+    "Name": "Kazuya",
+    "ImgURL": "images/kaz.png"
+  },
+  {
+    "Id": 9,
+    "Name": "Steve",
+    "ImgURL": "images/steve.png"
+  },
+  {
+    "Id": 10,
+    "Name": "Jack-8",
+    "ImgURL": "images/jack.png"
+  },
+  {
+    "Id": 11,
+    "Name": "Asuka",
+    "ImgURL": "images/asuka.png"
+  },
+  {
+    "Id": 12,
+    "Name": "Devil Jin",
+    "ImgURL": "images/dvj.png"
+  },
+  {
+    "Id": 13,
+    "Name": "Feng",
+    "ImgURL": "images/feng.png"
+  },
+  {
+    "Id": 14,
+    "Name": "Lili",
+    "ImgURL": "images/lili.png"
+  },
+  {
+    "Id": 15,
+    "Name": "Dragunov",
+    "ImgURL": "images/dragunov.png"
+  },
+  {
+    "Id": 16,
+    "Name": "Leo",
+    "ImgURL": "images/leo.png"
+  },
+  {
+    "Id": 17,
+    "Name": "Lars",
+    "ImgURL": "images/lars.png"
+  },
+  {
+    "Id": 18,
+    "Name": "Alisa",
+    "ImgURL": "images/alisa.png"
+  },
+  {
+    "Id": 19,
+    "Name": "Claudio",
+    "ImgURL": "images/claudio.png"
+  },
+  {
+    "Id": 20,
+    "Name": "Shaheen",
+    "ImgURL": "images/shaheen.png"
+  },
+  {
+    "Id": 21,
+    "Name": "Nina",
+    "ImgURL": "images/nina.png"
+  },
+  {
+    "Id": 22,
+    "Name": "Lee",
+    "ImgURL": "images/lee.png"
+  },
+  {
+    "Id": 23,
+    "Name": "Kuma",
+    "ImgURL": "images/kuma.png"
+  },
+  {
+    "Id": 24,
+    "Name": "Panda",
+    "ImgURL": "images/panda.png"
+  },
+  {
+    "Id": 28,
+    "Name": "Zafina",
+    "ImgURL": "images/zafina.png"
+  },
+  {
+    "Id": 29,
+    "Name": "Leroy",
+    "ImgURL": "images/leroy.png"
+  },
+  {
+    "Id": 32,
+    "Name": "Jun",
+    "ImgURL": "images/jun.png"
+  },
+  {
+    "Id": 33,
+    "Name": "Reina",
+    "ImgURL": "images/reyna.png"
+  },
+  {
+    "Id": 34,
+    "Name": "Azucena",
+    "ImgURL": "images/azusena.png"
+  },
+  {
+    "Id": 35,
+    "Name": "Victor",
+    "ImgURL": "images/victor.png"
+  },
+  {
+    "Id": 36,
+    "Name": "Raven",
+    "ImgURL": "images/raven.png"
+  },
+  {
+    "Id": 38,
+    "Name": "Eddy",
+    "ImgURL": "images/eddy.png"
+  },
+  {
+    "Id": 39,
+    "Name": "Lidia",
+    "ImgURL": "images/lidia.png"
+  },
+  {
+    "Id": 40,
+    "Name": "Heihachi",
+    "ImgURL": "images/hei.png"
+  },
+  {
+    "Id": 41,
+    "Name": "Clive",
+    "ImgURL": "images/steve.png"
+  },
+  {
+    "Id": 42,
+    "Name": "Anna",
+    "ImgURL": "images/anna.png"
+  }
 ]
