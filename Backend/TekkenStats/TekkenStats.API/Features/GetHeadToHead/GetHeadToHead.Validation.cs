@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace TekkenStats.API.Features.HeadToHead;
+namespace TekkenStats.API.Features.GetHeadToHead;
 
 public class GetHeadToHeadRequestValidator : AbstractValidator<GetHeadToHeadRequest>
 {

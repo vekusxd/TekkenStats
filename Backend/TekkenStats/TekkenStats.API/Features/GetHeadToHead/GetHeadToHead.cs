@@ -7,7 +7,7 @@ using TekkenStats.API.Features.Shared;
 using TekkenStats.Core.Entities;
 using TekkenStats.DataAccess;
 
-namespace TekkenStats.API.Features.HeadToHead;
+namespace TekkenStats.API.Features.GetHeadToHead;
 
 public class GetHeadToHead : IEndpoint
 {
