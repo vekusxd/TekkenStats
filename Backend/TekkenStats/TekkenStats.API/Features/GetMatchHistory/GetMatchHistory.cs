@@ -207,24 +207,4 @@ public class GetMatchHistoryResponse
     public int TotalMatches { get; set; }
 }
 
-public class MatchResponse
-{
-    public required string BattleId { get; init; }
-    public DateTime Date { get; init; }
-    public long GameVersion { get; init; }
-    public bool Winner { get; init; }
-    public required ChallengerInfoResponse Challenger { get; init; }
-    public required ChallengerInfoResponse Opponent { get; init; }
-}
 
-public class ChallengerInfoResponse
-{
-    public int CharacterId { get; init; }
-    public required string TekkenId { get; init; }
-    public required string Name { get; init; }
-    public required string CharacterName { get; init; }
-    public required string CharacterImgURL { get; init; }
-    public int Rounds { get; init; }
-    public int RatingBefore { get; init; }
-    public int RatingChange { get; init; }
-}
