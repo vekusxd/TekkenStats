@@ -9,16 +9,18 @@ using TekkenStats.DataAccess;
 
 namespace TekkenStats.API.Features.GetMatchHistory;
 
-public class GetPlayerMatches : IEndpoint
+public class GetMatchHistory : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapGet("/matches/{tekkenId}", Handler);
+        app.MapGet("/matches/{tekkenId}/{opponentTekkenId?}", Handler);
     }
 
     private async Task<Results<Ok<GetMatchHistoryResponse>, NotFound, ValidationProblem>> Handler(
-        [AsParameters] GetPlayerMatchHistoryRequest request,
-        IValidator<GetPlayerMatchHistoryRequest> validator,
+        string tekkenId,
+        string? opponentTekkenId,
+        [AsParameters] GetMatchHistoryRequest request,
+        IValidator<GetMatchHistoryRequest> validator,
         MongoDatabase db,
         CharacterStore characterStore)
     {
@@ -34,9 +36,9 @@ public class GetPlayerMatches : IEndpoint
         var skip = (pageNumber - 1) * pageSize;
 
         var pipeline = collection.Aggregate()
-            .Match(p => p.TekkenId == request.TekkenId);
+            .Match(p => p.TekkenId == tekkenId);
 
-        var matchesFilter = BuildMatchesFilter(request.CharacterId, request.OpponentCharacterId);
+        var matchesFilter = BuildMatchesFilter(request.CharacterId, request.OpponentCharacterId, opponentTekkenId);
 
         var player = await pipeline
             .Project<PlayerMatchesProjection>(new BsonDocument
@@ -118,7 +120,7 @@ public class GetPlayerMatches : IEndpoint
                 GameVersion = m.GameVersion,
                 Challenger = new ChallengerInfoResponse
                 {
-                    TekkenId = request.TekkenId,
+                    TekkenId = tekkenId,
                     Name = m.Challenger.Name,
                     CharacterId = m.Challenger.CharacterId,
                     CharacterName = characterStore.GetCharacter(m.Challenger.CharacterId).Name,
@@ -143,36 +145,50 @@ public class GetPlayerMatches : IEndpoint
         return TypedResults.Ok(result);
     }
 
-    private BsonDocument? BuildMatchesFilter(int? characterId, int? opponentCharacterId)
+    private BsonDocument? BuildMatchesFilter(int? characterId, int? opponentCharacterId, string? opponentTekkenId)
     {
-        var conditions = new BsonArray();
+        var conditions = new List<BsonDocument>();
 
         if (characterId.HasValue)
         {
-            conditions.Add(new BsonDocument(
-                "$eq",
-                new BsonArray { "$$match.Challenger.CharacterId", characterId.Value }
-            ));
+            conditions.Add(new BsonDocument("$eq", new BsonArray
+            {
+                "$$match.Challenger.CharacterId",
+                characterId.Value
+            }));
         }
 
         if (opponentCharacterId.HasValue)
         {
-            conditions.Add(new BsonDocument(
-                "$eq",
-                new BsonArray { "$$match.Opponent.CharacterId", opponentCharacterId.Value }
-            ));
+            conditions.Add(new BsonDocument("$eq", new BsonArray
+            {
+                "$$match.Opponent.CharacterId",
+                opponentCharacterId.Value
+            }));
         }
 
-        return conditions.Count > 0
-            ? new BsonDocument("$and", conditions)
-            : null;
+        if (!string.IsNullOrEmpty(opponentTekkenId))
+        {
+            conditions.Add(new BsonDocument("$eq", new BsonArray
+            {
+                "$$match.Opponent.TekkenId",
+                opponentTekkenId
+            }));
+        }
+
+        if (conditions.Count == 0)
+        {
+            return null;
+        }
+
+        return conditions.Count == 1 
+            ? conditions[0] 
+            : new BsonDocument("$and", new BsonArray(conditions));
     }
 }
 
-public class GetPlayerMatchHistoryRequest
+public class GetMatchHistoryRequest
 {
-    [FromRoute] public required string TekkenId { get; set; }
-
     [FromQuery] public int? PageSize { get; set; } = 10;
     [FromQuery] public int? PageNumber { get; set; } = 1;
     [FromQuery] public int? CharacterId { get; init; }
