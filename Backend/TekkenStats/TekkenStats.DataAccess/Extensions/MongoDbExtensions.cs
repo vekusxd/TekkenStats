@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver;
-using TekkenStats.Core.Entities;
 using TekkenStats.Core.Options;
 
 namespace TekkenStats.DataAccess.Extensions;

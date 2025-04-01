@@ -1,7 +1,6 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Caching.Memory;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using TekkenStats.API.Features.Shared;

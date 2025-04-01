@@ -6,37 +6,50 @@ using TekkenStats.API.Features.Shared;
 using TekkenStats.Core.Entities;
 using TekkenStats.DataAccess;
 
-namespace TekkenStats.API.Features.GetMatchups;
+namespace TekkenStats.API.Features.GetRivals;
 
-public class GetMatchups : IEndpoint
+public class GetRivals : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapGet("/matchups/{tekkenId}", Handler);
+        app.MapGet("/rivals/{tekkenId}", Handler);
     }
 
-    private async Task<Results<Ok<List<MatchupsResponse>>, NotFound>> Handler(
+    private async Task<Results<Ok<List<RivalsResponse>>, NotFound>> Handler(
         string tekkenId,
         [FromQuery] int? playerCharacterId,
+        [FromQuery] int? opponentCharacterId,
         MongoDatabase mongoDatabase,
         CharacterStore characterStore)
     {
         var collection = mongoDatabase.Db.GetCollection<BsonDocument>(Player.CollectionName);
-        var pipeline = new List<BsonDocument>();
+        var pipeline = new List<BsonDocument>
+        {
+            new("$match", new BsonDocument("_id", tekkenId)),
+            new("$unwind", "$Matches")
+        };
 
-        pipeline.Add(new BsonDocument("$match", new BsonDocument("_id", tekkenId)));
-
-        pipeline.Add(new BsonDocument("$unwind", "$Matches"));
+        var matchFilters = new BsonDocument();
 
         if (playerCharacterId.HasValue)
         {
-            pipeline.Add(new BsonDocument("$match",
-                new BsonDocument("Matches.Challenger.CharacterId", playerCharacterId.Value)));
+            matchFilters.Add("Matches.Challenger.CharacterId", playerCharacterId.Value);
+        }
+
+        if (opponentCharacterId.HasValue)
+        {
+            matchFilters.Add("Matches.Opponent.CharacterId", opponentCharacterId.Value);
+        }
+
+        if (matchFilters.ElementCount > 0)
+        {
+            pipeline.Add(new BsonDocument("$match", matchFilters));
         }
 
         var groupStage = new BsonDocument
         {
-            { "_id", "$Matches.Opponent.CharacterId" },
+            { "_id", "$Matches.Opponent.TekkenId" },
+            { "OpponentName", new BsonDocument("$first", "$Matches.Opponent.Name") }, // Сохраняем имя оппонента
             { "Wins", new BsonDocument("$sum", new BsonDocument("$cond", new BsonArray { "$Matches.Winner", 1, 0 })) },
             {
                 "Losses", new BsonDocument("$sum", new BsonDocument("$cond", new BsonArray { "$Matches.Winner", 0, 1 }))
@@ -48,7 +61,8 @@ public class GetMatchups : IEndpoint
         var projectStage = new BsonDocument
         {
             { "_id", 0 },
-            { "OpponentCharacterId", "$_id" },
+            { "TekkenId", "$_id" },
+            { "Name", "$OpponentName" },
             { "TotalMatches", 1 },
             { "Wins", 1 },
             { "Losses", 1 }
@@ -57,36 +71,36 @@ public class GetMatchups : IEndpoint
 
         pipeline.Add(new BsonDocument("$sort", new BsonDocument("TotalMatches", -1)));
 
-        var cursor = await collection.AggregateAsync<PlayerMatchStats>(pipeline);
-
+        var cursor = await collection.AggregateAsync<PlayerOpponentStats>(pipeline);
         var result = await cursor.ToListAsync();
 
         if (result == null)
             return TypedResults.NotFound();
 
-        return TypedResults.Ok(result.Select(c => new MatchupsResponse
+        return TypedResults.Ok(result.Select(c => new RivalsResponse
         {
-            OpponentCharacterId = c.OpponentCharacterId,
+            TekkenId = c.TekkenId,
+            Name = c.Name,
             Wins = c.Wins,
             Losses = c.Losses,
             TotalMatches = c.TotalMatches,
-            CharacterName = characterStore.GetCharacter(c.OpponentCharacterId).Name
         }).ToList());
     }
 }
 
-public class PlayerMatchStats
+public class PlayerOpponentStats
 {
-    public int OpponentCharacterId { get; init; }
-    public int TotalMatches { get; init; }
+    public required string TekkenId { get; init; }
+    public required string Name { get; init; }
     public int Wins { get; init; }
     public int Losses { get; init; }
+    public int TotalMatches { get; init; }
 }
 
-public class MatchupsResponse
+public class RivalsResponse
 {
-    public int OpponentCharacterId { get; init; }
-    public required string CharacterName { get; init; }
+    public required string TekkenId { get; init; }
+    public required string Name { get; init; }
     public int TotalMatches { get; init; }
     public int Wins { get; init; }
     public int Losses { get; init; }

@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
 using TekkenStats.Core.Entities;
-using TekkenStats.DataAccess;
 
 namespace TekkenStats.API.Features.Shared;
 
