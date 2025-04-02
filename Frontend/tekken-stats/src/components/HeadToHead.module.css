@@ -1,0 +1,282 @@
+.pageWrapper {
+    min-height: 100vh;
+    background-color: #000;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .contentContainer {
+    padding-top: 20px;
+    flex: 1;
+  }
+  
+  .contentWrapper {
+    flex: 1;
+    width: 100%;
+    padding-top: 1rem;
+  }
+  
+  .headToHeadContainer {
+    max-width: 1280px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 1rem;
+    color: #fff;
+    font-family: 'Inter', sans-serif;
+  }
+  
+  .headToHeadHeader {
+    background-color: #111827;
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .headToHeadTitle {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: #fff;
+    text-align: center;
+  }
+  
+  .playerVs {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1.25rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+  }
+  
+  .playerName, .opponentName {
+    font-weight: 700;
+    color: #fff;
+    padding: 0.5rem;
+    border-radius: 0.25rem;
+  }
+  
+  .playerName {
+    background-color: rgba(59, 130, 246, 0.2);
+  }
+  
+  .opponentName {
+    background-color: rgba(239, 68, 68, 0.2);
+  }
+  
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    justify-content: center;
+  }
+  
+  .filterGroup {
+    flex: 1;
+    min-width: 220px;
+    max-width: 300px;
+  }
+  
+  .filterGroup label {
+    display: block;
+    color: #d1d5db;
+    font-size: 0.95rem;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+  }
+  
+  .filterGroup select {
+    width: 100%;
+    padding: 0.75rem;
+    background-color: #1f2937;
+    border: 1px solid #374151;
+    border-radius: 0.5rem;
+    color: #fff;
+    font-size: 1rem;
+    transition: all 0.2s;
+  }
+  
+  .filterGroup select:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+  }
+  
+  .stats {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    font-size: 1.25rem;
+    margin-bottom: 2rem;
+    align-items: center;
+  }
+  
+  .winRate {
+    color: #22c55e;
+    font-weight: 700;
+    font-size: 1.5rem;
+  }
+  
+  .matchesList {
+    background-color: #111827;
+    border-radius: 0.75rem;
+    overflow: hidden;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  }
+  
+  .matchHeader {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 0.7fr 1fr 0.7fr;
+    padding: 1rem 1.5rem;
+    background-color: #1f2937;
+    font-weight: 600;
+    color: #fff;
+    font-size: 0.95rem;
+  }
+  
+  .matchItem {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 0.7fr 1fr 0.7fr;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #1f2937;
+    align-items: center;
+    transition: background-color 0.2s;
+  }
+  
+  .matchItem:hover {
+    background-color: #1a202c;
+  }
+  
+  .matchItem.win {
+    background-color: rgba(34, 197, 94, 0.08);
+  }
+  
+  .matchItem.loss {
+    background-color: rgba(239, 68, 68, 0.08);
+  }
+  
+  .matchDate {
+    color: #9ca3af;
+    font-size: 0.9rem;
+  }
+  
+  .playerInfo, .opponentInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  
+  .playerName, .opponentName {
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+  
+  .characterName {
+    font-size: 0.85rem;
+    color: #9ca3af;
+  }
+  
+  .rating {
+    font-size: 0.8rem;
+    color: #6b7280;
+  }
+  
+  .score {
+    font-weight: 700;
+    font-size: 1.1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+  }
+  
+  .ratingChange {
+    font-weight: 600;
+    font-size: 1rem;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    padding-right: 1rem;
+  }
+  
+  
+  .ratingChange[data-positive="true"] {
+    color: #22c55e;
+  }
+  
+  .ratingChange:not([data-positive="true"]) {
+    color: #ef4444;
+  }
+  
+  .footer {
+    padding: 1.5rem;
+    text-align: center;
+    font-size: 0.95rem;
+    color: #9ca3af;
+  }
+
+  .matchHeader span:nth-child(3) {
+    text-align: center;
+  }
+  
+  .matchHeader span:nth-child(5) {
+    text-align: right;
+    padding-right: 1rem;
+  }
+  
+  @media (max-width: 1024px) {
+    .headToHeadContainer {
+      padding: 0 1.5rem;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .matchHeader,
+    .matchItem {
+      grid-template-columns: 1.2fr 1fr 0.5fr;
+      padding: 0.75rem 1rem;
+    }
+    
+    .matchHeader span:nth-child(4),
+    .matchHeader span:nth-child(5),
+    .matchItem div:nth-child(4),
+    .matchItem div:nth-child(5) {
+      display: none;
+    }
+    
+    .filters {
+      flex-direction: column;
+      gap: 1rem;
+      align-items: center;
+    }
+    
+    .filterGroup {
+      min-width: 100%;
+      max-width: 100%;
+    }
+  
+    .playerVs {
+      font-size: 1.1rem;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .headToHeadHeader {
+      padding: 1rem;
+    }
+  
+    .headToHeadTitle {
+      font-size: 1.3rem;
+    }
+  
+    .matchHeader,
+    .matchItem {
+      grid-template-columns: 1fr 1fr;
+    }
+  
+    .matchHeader span:nth-child(3),
+    .matchItem div:nth-child(3) {
+      display: none;
+    }
+  }
