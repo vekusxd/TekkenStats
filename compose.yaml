@@ -1,0 +1,14 @@
+include:
+  - "Backend/TekkenStats/compose.yaml"
+
+services:
+  tekkenstats_client:
+    container_name: tekkenstats_client
+    image: tekkenstats_client
+    ports:
+      - "8081:8081"
+    build:
+      context: Frontend/tekken-stats
+      dockerfile: Dockerfile
+    networks:
+      - app-network
