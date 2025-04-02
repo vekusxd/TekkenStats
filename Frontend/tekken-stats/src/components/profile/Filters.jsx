@@ -11,10 +11,12 @@ const Filters = ({
   playerFilterKey = 'playerCharacterId'
 }) => {
   const handleFilterChange = (filterName, value) => {
-    setFilters(prev => ({
-      ...prev,
-      [filterName]: value === 'All Characters' ? null : value
-    }));
+    const newFilters = {
+      ...filters,
+      [filterName]: value === 'All Characters' ? null : value,
+      pageNumber: 1 
+    };
+    setFilters(newFilters);
   };
 
   return (

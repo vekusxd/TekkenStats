@@ -2,19 +2,24 @@ import React from 'react';
 import styles from '../TekkenStatsProfile.module.css';
 
 const NameHistory = ({ names }) => {
+  const formatUTCDate = (dateString) => {
+    const date = new Date(dateString);
+    return `${date.getUTCDate()} ${date.toLocaleString('en-US', { month: 'short' })} ${date.getUTCFullYear()}`;
+  };
+
   return (
     <div className={styles.sidebarSection}>
       <h2 className={styles.sectionTitle}>Name History</h2>
       <div className={styles.nameHistory}>
         {names.map((name, index) => (
-          <NameItem key={index} name={name} />
+          <NameItem key={index} name={name} formatUTCDate={formatUTCDate} />
         ))}
       </div>
     </div>
   );
 };
 
-const NameItem = ({ name }) => (
+const NameItem = ({ name, formatUTCDate }) => (
   <div className={styles.nameHistoryItem}>
     <p className={styles.name}>{name.playerName}</p>
     <div className={styles.date}>
@@ -41,7 +46,7 @@ const NameItem = ({ name }) => (
         <path d="M12 18h.01"></path>
         <path d="M16 18h.01"></path>
       </svg>
-      {new Date(name.date).toLocaleDateString()}
+      {formatUTCDate(name.date)}
     </div>
   </div>
 );

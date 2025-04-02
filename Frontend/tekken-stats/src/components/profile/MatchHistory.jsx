@@ -39,6 +39,24 @@ const MatchItem = ({ match }) => {
     navigate(`/${playerId}`);
   };
 
+  const formatUTCDate = (dateString) => {
+    const date = new Date(dateString);
+    const day = date.getUTCDate();
+    const month = date.toLocaleString('en-US', { month: 'short'});
+    const year = date.getUTCFullYear();
+    return `${day} ${month} ${year}`;
+  };
+
+  const formatUTCTime = (dateString) => {
+    const date = new Date(dateString);
+    const hours = date.getUTCHours().toString().padStart(2, '0');
+    const minutes = date.getUTCMinutes().toString().padStart(2, '0');
+    return `${hours}:${minutes}`;
+  };
+
+  const formattedDate = formatUTCDate(match.date);
+  const formattedTime = formatUTCTime(match.date);
+
   return (
     <div className={styles.matchItem}>
       <div className={styles.matchInfo}>
@@ -91,11 +109,18 @@ const MatchItem = ({ match }) => {
               {match.winner ? '+' : '-'}{Math.abs(match.challenger.ratingChange)}
             </span>
           </div>
+          <div className={styles.matchTime}>
+            <span className={styles.textGray}>{formattedDate}</span>
+            <span className={styles.textGray}>•</span>
+            <span className={styles.textGray}>{formattedTime}</span>
+          </div>
         </div>
       </div>
-      <p className={`${match.winner ? styles.textGreen : styles.textRed} ${styles.matchResult}`}>
-        {match.winner ? 'Victory' : 'Defeat'}
-      </p>
+      <div className={styles.matchResultContainer}>
+        <p className={`${match.winner ? styles.textGreen : styles.textRed} ${styles.matchResult}`}>
+          {match.winner ? 'Victory' : 'Defeat'}
+        </p>
+      </div>
     </div>
   );
 };
