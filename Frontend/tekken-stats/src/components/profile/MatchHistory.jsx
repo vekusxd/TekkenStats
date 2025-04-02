@@ -10,6 +10,7 @@ const MatchHistory = ({ matches, filters, setFilters, profile, opponentCharacter
         filters={filters} 
         setFilters={setFilters} 
         profile={profile} 
+        playerFilterKey="characterId"
         opponentCharacters={opponentCharacters}
       />
       

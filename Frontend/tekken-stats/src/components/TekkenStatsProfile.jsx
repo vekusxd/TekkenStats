@@ -38,7 +38,7 @@ const TekkenStatsProfile = () => {
           params: {
             PageSize: filters.pageSize,
             PageNumber: filters.pageNumber,
-            PlayerCharacterId: filters.playerCharacterId,
+            CharacterId: filters.characterId,
             OpponentCharacterId: filters.opponentCharacterId
           }
         });
