@@ -7,13 +7,16 @@ const Filters = ({
   profile, 
   opponentCharacters,
   showPlayerCharacterFilter = true,
-  showOpponentCharacterFilter = true
+  showOpponentCharacterFilter = true,
+  playerFilterKey = 'playerCharacterId'
 }) => {
   const handleFilterChange = (filterName, value) => {
-    setFilters(prev => ({
-      ...prev,
-      [filterName]: value === 'All Characters' ? null : value
-    }));
+    const newFilters = {
+      ...filters,
+      [filterName]: value === 'All Characters' ? null : value,
+      pageNumber: 1 
+    };
+    setFilters(newFilters);
   };
 
   return (
@@ -23,8 +26,8 @@ const Filters = ({
           <label className={styles.filterLabel}>Your Character</label>
           <select 
             className={styles.selectInput}
-            value={filters.playerCharacterId || 'All Characters'}
-            onChange={(e) => handleFilterChange('playerCharacterId', e.target.value)}
+            value={filters[playerFilterKey] || 'All Characters'}
+            onChange={(e) => handleFilterChange(playerFilterKey, e.target.value)}
           >
             <option value="All Characters">All Characters</option>
             {(profile.characters || []).map(char => (

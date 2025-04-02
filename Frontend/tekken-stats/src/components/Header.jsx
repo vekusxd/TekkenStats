@@ -1,28 +1,29 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { usePlayerSearch } from '../hooks/usePlayerSearch';
 import styles from './TekkenStatsApp.module.css';
-import { BASE_URL } from '../config/baseUrl';
 
 const Header = () => {
   const [searchQuery, setSearchQuery] = useState('');
+  const [inputError, setInputError] = useState(null);
   const navigate = useNavigate();
+  const { searchPlayers } = usePlayerSearch();
+
+  const handleInputChange = (e) => {
+    const value = e.target.value;
+    setSearchQuery(value);
+    setInputError(null);
+  };
 
   const handleSearch = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.get(`${BASE_URL}/api/names`, {
-        params: {
-          StartsWith: searchQuery,
-          Amount: 1
-        }
-      });
-      
-      if (response.data.length > 0) {
-        navigate(`/${response.data[0].tekkenId}`);
+      const results = await searchPlayers(searchQuery);
+      if (results.length > 0) {
+        navigate(`/${results[0].tekkenId}`);
       }
-    } catch (err) {
-      console.error('Search error:', err);
+    } catch (error) {
+      setInputError(error.message);
     }
   };
 
@@ -33,27 +34,30 @@ const Header = () => {
           <a className={styles.logo} href="/">Tekken Stats</a>
           <div className={styles.headerSearchContainer}>
             <form onSubmit={handleSearch} className={styles.headerSearchForm}>
-              <input 
-                type="text" 
-                placeholder="Search player..." 
-                className={styles.headerSearchInput}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-              <button type="submit" className={styles.headerSearchIcon}>
-                <svg 
-                  xmlns="http://www.w3.org/2000/svg" 
-                  viewBox="0 0 24 24" 
-                  fill="none" 
-                  stroke="currentColor" 
-                  strokeWidth="2" 
-                  strokeLinecap="round" 
-                  strokeLinejoin="round"
+              <div className={styles.headerInputWrapper}>
+                <input 
+                  type="text" 
+                  placeholder="Search player..." 
+                  className={`${styles.headerSearchInput} ${inputError ? styles.inputError : ''}`}
+                  value={searchQuery}
+                  onChange={handleInputChange}
+                />
+                <button 
+                  type="submit" 
+                  className={styles.headerSearchIcon}
+                  disabled={!searchQuery.trim()}
                 >
-                  <circle cx="11" cy="11" r="8"></circle>
-                  <path d="m21 21-4.3-4.3"></path>
-                </svg>
-              </button>
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <path d="m21 21-4.3-4.3"></path>
+                  </svg>
+                </button>
+              </div>
+              {inputError && (
+                <div className={styles.headerError}>
+                  {inputError}
+                </div>
+              )}
             </form>
           </div>
         </div>

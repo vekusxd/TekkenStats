@@ -178,3 +178,74 @@
       margin-bottom: 1.5rem;
     }
   }
+
+  /* Общие стили для ошибок */
+.inputError {
+  border: 2px solid #ff4444 !important;
+  box-shadow: 0 0 0 2px rgba(255, 68, 68, 0.2);
+}
+
+/* Стили для Header (ошибка снизу) */
+.headerInputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.headerError {
+  position: absolute;
+  bottom: -25px;
+  left: 0;
+  background: #ff4444;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  z-index: 10;
+  white-space: nowrap;
+}
+
+.headerError::before {
+  content: '';
+  position: absolute;
+  top: -5px;
+  left: 15px;
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-bottom: 5px solid #ff4444;
+}
+
+/* Стили для Search (ошибка сверху) */
+.searchInputWrapper {
+  position: relative;
+  width: 100%;
+}
+
+.searchError {
+  position: absolute;
+  top: -30px;
+  left: 0;
+  background: #ff4444;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 14px;
+  z-index: 10;
+  white-space: nowrap;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.searchError::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 15px;
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 5px solid #ff4444;
+}

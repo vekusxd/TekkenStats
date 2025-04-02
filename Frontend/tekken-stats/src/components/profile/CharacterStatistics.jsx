@@ -19,6 +19,12 @@ const CharacterItem = ({ character }) => {
     ? `http://localhost:8080/${character.imgURL.replace(/^\/+/, '')}`
     : '/images/default-character.png';
 
+  const formatUTCDate = (dateString) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return `${date.getUTCDate()} ${date.toLocaleString('en-US', { month: 'short'})} ${date.getUTCFullYear()}`;
+  };
+
   return (
     <div className={styles.characterStatItem}>
       <div className={styles.characterInfo}>
@@ -43,7 +49,7 @@ const CharacterItem = ({ character }) => {
       <div className={styles.characterStats}>
         <p className={styles.matchesCount}>{character.matchesCount} matches</p>
         <p className={styles.lastPlayed}>
-          {character.lastPlayed ? `Last played: ${new Date(character.lastPlayed).toLocaleDateString()}` : ''}
+          {character.lastPlayed ? `Last played: ${formatUTCDate(character.lastPlayed)}` : ''}
         </p>
       </div>
     </div>
