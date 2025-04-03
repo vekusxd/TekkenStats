@@ -1,72 +1,34 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { BASE_URL } from '../config/baseUrl';
-import styles from './HeadToHead.module.css';
-import { useParams } from 'react-router-dom';
+import React from 'react';
+import styles from '../styles/HeadToHead.module.css';
 import Header from './Header';
+import { useHeadToHeadData } from '../hooks/useHeadToHeadData';
 
 const HeadToHead = () => {
-  const { tekkenId, opponentTekkenId } = useParams();
-  const [headToHeadData, setHeadToHeadData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [yourCharacterFilter, setYourCharacterFilter] = useState('All');
-  const [opponentCharacterFilter, setOpponentCharacterFilter] = useState('All');
-  const [resultFilter, setResultFilter] = useState('All');
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        const response = await axios.get(`${BASE_URL}/api/head-to-head/${tekkenId}/${opponentTekkenId}`);
-        setHeadToHeadData(response.data);
-        setLoading(false);
-      } catch (err) {
-        setError(err.message);
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [tekkenId, opponentTekkenId]);
-
-  const filteredMatches = headToHeadData?.matches.filter(match => {
-    const yourCharacterMatch = yourCharacterFilter === 'All' || 
-      match.challenger.characterName === yourCharacterFilter;
-    const opponentCharacterMatch = opponentCharacterFilter === 'All' || 
-      match.opponent.characterName === opponentCharacterFilter;
-    const resultMatch = resultFilter === 'All' || 
-      (resultFilter === 'Win' && match.winner) || 
-      (resultFilter === 'Loss' && !match.winner);
-    return yourCharacterMatch && opponentCharacterMatch && resultMatch;
-  });
+  const {
+    loading,
+    error,
+    headToHeadData,
+    filteredMatches,
+    winCount,
+    lossCount,
+    winRate,
+    playerName,
+    opponentName,
+    playerRating,
+    opponentRating,
+    yourCharacters,
+    opponentCharacters,
+    yourCharacterFilter,
+    setYourCharacterFilter,
+    opponentCharacterFilter,
+    setOpponentCharacterFilter,
+    resultFilter,
+    setResultFilter
+  } = useHeadToHeadData();
 
   if (loading) return <div className={styles.loading}>Loading head-to-head data...</div>;
   if (error) return <div className={styles.error}>Error: {error}</div>;
-  if (!headToHeadData) return <div className={styles.noData}>No head-to-head data found</div>;
-
-  const playerName = headToHeadData.matches[0]?.challenger.name || 'Player';
-  const opponentName = headToHeadData.matches[0]?.opponent.name || 'Opponent';
-
-  const getLatestRating = (isChallenger) => {
-    for (let i = headToHeadData.matches.length - 1; i >= 0; i--) {
-      const rating = isChallenger 
-        ? headToHeadData.matches[i].challenger.ratingBefore 
-        : headToHeadData.matches[i].opponent.ratingBefore;
-      if (rating !== 0) return rating;
-    }
-    return 0;
-  };
-
-  const playerRating = getLatestRating(true);
-  const opponentRating = getLatestRating(false);
-
-  const yourCharacters = [...new Set(
-    headToHeadData.matches.map(m => m.challenger.characterName)
-  )];
-  const opponentCharacters = [...new Set(
-    headToHeadData.matches.map(m => m.opponent.characterName)
-  )];
+  if (!headToHeadData || filteredMatches.length === 0) return <div className={styles.noData}>No head-to-head data found</div>;
 
   return (
     <div className={styles.pageWrapper}>
@@ -81,7 +43,6 @@ const HeadToHead = () => {
               <span className={styles.opponentName}>{opponentName} ({opponentRating})</span>
             </div>
             
-            {/* ... остальной код без изменений ... */}
             <div className={styles.filters}>
               <div className={styles.filterGroup}>
                 <label>Your Character:</label>
@@ -123,8 +84,8 @@ const HeadToHead = () => {
             </div>
             
             <div className={styles.stats}>
-              <span>{headToHeadData.winCount}–{headToHeadData.lossCount}</span>
-              <span className={styles.winRate}>{headToHeadData.challengerWinRate}%</span>
+              <span>{winCount}–{lossCount}</span>
+              <span className={styles.winRate}>{winRate}%</span>
             </div>
           </div>
 

@@ -1,20 +1,23 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { usePlayerSearch } from '../hooks/usePlayerSearch';
-import styles from './TekkenStatsApp.module.css';
+import { useInlineSearch } from '../hooks/useInlineSearch';
+import styles from '../styles/TekkenStatsApp.module.css';
 import Header from './Header';
 
 const Search = () => {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [inputError, setInputError] = useState(null);
   const navigate = useNavigate();
-  const { searchPlayers, loading } = usePlayerSearch();
-
-  const handleInputChange = (e) => {
-    const value = e.target.value;
-    setSearchQuery(value);
-    setInputError(null);
-  };
+  const {
+    searchQuery,
+    inputError,
+    suggestions,
+    showSuggestions,
+    loading,
+    searchPlayers,
+    handleInputChange,
+    setSearchQuery,
+    setShowSuggestions,
+    setInputError
+  } = useInlineSearch();
 
   const handleSearch = async (e) => {
     e.preventDefault();
@@ -26,6 +29,12 @@ const Search = () => {
     } catch (error) {
       setInputError(error.message);
     }
+  };
+
+  const handlePlayerClick = (player) => {
+    setSearchQuery(player.name);
+    navigate(`/${player.tekkenId}`);
+    setShowSuggestions(false);
   };
 
   return (
@@ -43,11 +52,26 @@ const Search = () => {
                   placeholder="Search player name..."
                   className={`${styles.searchInput} ${inputError ? styles.inputError : ''}`}
                   value={searchQuery}
-                  onChange={handleInputChange}
+                  onChange={(e) => handleInputChange(e.target.value)}
+                  onFocus={() => searchQuery.length > 0 && setShowSuggestions(true)}
+                  onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
                 />
                 {inputError && (
                   <div className={styles.searchError}>
                     {inputError}
+                  </div>
+                )}
+                {showSuggestions && suggestions.length > 0 && (
+                  <div className={styles.suggestionsDropdown}>
+                    {suggestions.map(player => (
+                      <div 
+                        key={player.tekkenId}
+                        className={styles.suggestionItem}
+                        onClick={() => handlePlayerClick(player)}
+                      >
+                        {player.name}
+                      </div>
+                    ))}
                   </div>
                 )}
               </div>

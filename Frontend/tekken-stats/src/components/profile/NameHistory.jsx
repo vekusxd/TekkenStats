@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from '../TekkenStatsProfile.module.css';
+import styles from '../../styles/NameHistory.module.css';
 
 const NameHistory = ({ names }) => {
   const formatUTCDate = (dateString) => {

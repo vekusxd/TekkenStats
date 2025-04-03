@@ -1,53 +1,28 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { useState } from 'react';
+import styles from '../../styles/Matchups.module.css';
+import { getWinRateColor } from '../../styles/winRateStyles';
+import { useMatchups } from '../../hooks/useMatchups';
+import Filters from './Filters';
 import { BASE_URL } from '../../config/baseUrl';
-import styles from '../TekkenStatsProfile.module.css';
 
 const Matchups = ({ tekkenId, profile }) => {
-  const [matchups, setMatchups] = useState([]);
-  const [error, setError] = useState(null);
   const [filters, setFilters] = useState({
     playerCharacterId: 'All Characters'
   });
 
-  useEffect(() => {
-    const fetchMatchups = async () => {
-      try {
-        const response = await axios.get(`${BASE_URL}/api/matchups/${tekkenId}`, {
-          params: {
-            playerCharacterId: filters.playerCharacterId === 'All Characters' ? undefined : filters.playerCharacterId
-          }
-        });
-        setMatchups(response.data);
-      } catch (err) {
-        setError(err.message);
-      }
-    };
+  const { matchups, loading, error } = useMatchups(tekkenId, filters.playerCharacterId);
 
-    fetchMatchups();
-  }, [tekkenId, filters]);
-
+  if (loading) return <div className={styles.loading}>Loading matchups...</div>;
   if (error) return <div className={styles.error}>Error loading matchups: {error}</div>;
 
   return (
     <div className={styles.tabContent}>
-      <div className={styles.filtersContainer}>
-        <div className={styles.filterItem}>
-          <label className={styles.filterLabel}>Your Character</label>
-          <select
-            className={styles.selectInput}
-            value={filters.playerCharacterId}
-            onChange={(e) => setFilters({...filters, playerCharacterId: e.target.value})}
-          >
-            <option value="All Characters">All Characters</option>
-            {(profile.characters || []).map(char => (
-              <option key={char.characterId} value={char.characterId}>
-                {char.characterName}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
+      <Filters 
+        filters={filters}
+        setFilters={setFilters}
+        profile={profile}
+        showOpponentCharacterFilter={false}
+      />
 
       <div className={styles.matchupsList}>
         {matchups.length > 0 ? (
@@ -55,6 +30,8 @@ const Matchups = ({ tekkenId, profile }) => {
             const characterImageUrl = matchup.characterImgURL 
               ? `${BASE_URL}/${matchup.characterImgURL.replace(/^\/+/, '')}`
               : '/images/default-character.png';
+
+            const winRateColor = getWinRateColor(matchup.winRate);
 
             return (
               <div key={matchup.opponentCharacterId} className={styles.matchupItem}>
@@ -84,11 +61,19 @@ const Matchups = ({ tekkenId, profile }) => {
                   </div>
                 </div>
                 <div className={styles.matchupStats}>
-                  <span className={styles.matchCount}>{matchup.winRate}% WR</span>
+                  <div className={styles.winRateGroup}>
+                    <span className={styles.matchCountLabel}>Win Rate: </span>
+                    <span style={{ color: winRateColor }}>
+                      {matchup.winRate}%
+                    </span>
+                  </div>
                   <div className={styles.winRateBar}>
                     <div 
                       className={styles.winRateFill}
-                      style={{ width: `${matchup.winRate}%` }}
+                      style={{ 
+                        width: `${matchup.winRate}%`,
+                        backgroundColor: winRateColor
+                      }}
                     ></div>
                   </div>
                 </div>

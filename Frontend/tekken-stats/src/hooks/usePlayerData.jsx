@@ -27,7 +27,7 @@ export const usePlayerData = (playerId, filters) => {
         })).sort((a, b) => a.characterName.localeCompare(b.characterName));
 
         const matchesParams = {
-          PageSize: Math.min(filters.pageSize, 50), // Ограничение до 50
+          PageSize: Math.min(filters.pageSize, 50),
           PageNumber: filters.pageNumber,
           CharacterId: filters.characterId,
           OpponentCharacterId: filters.opponentCharacterId

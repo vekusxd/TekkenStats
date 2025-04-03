@@ -1,7 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import styles from '../TekkenStatsProfile.module.css';
+import styles from '../../styles/MatchHistory.module.css';
 import Filters from './Filters';
+import { BASE_URL } from '../../config/baseUrl';
 
 const MatchHistory = ({ matches, filters, setFilters, profile, opponentCharacters }) => {
   return (
@@ -32,8 +33,8 @@ const MatchHistory = ({ matches, filters, setFilters, profile, opponentCharacter
 const MatchItem = ({ match }) => {
   const navigate = useNavigate();
   
-  const challengerImg = `http://localhost:8080/${match.challenger.characterImgURL}`;
-  const opponentImg = `http://localhost:8080/${match.opponent.characterImgURL}`;
+  const challengerImg = `${BASE_URL}/${match.challenger.characterImgURL}`;
+  const opponentImg = `${BASE_URL}/${match.opponent.characterImgURL}`;
 
   const handlePlayerClick = (playerId) => {
     navigate(`/${playerId}`);

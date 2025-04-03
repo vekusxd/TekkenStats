@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from '../TekkenStatsProfile.module.css';
+import styles from "../../styles/TekkenStatsProfile.module.css";
 
 const Filters = ({ 
   filters, 
