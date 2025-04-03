@@ -1,7 +1,11 @@
 import React from 'react';
-import styles from '../TekkenStatsProfile.module.css';
+import styles from '../../styles/ProfileSummary.module.css';
+import { getWinRateColor } from '../../styles/winRateStyles';
 
 const ProfileSummary = ({ profile }) => {
+  const winRate = Math.round((profile.winCount / profile.matchesCount) * 100);
+  const winRateColor = getWinRateColor(winRate);
+
   return (
     <div className={styles.profileSummary}>
       <h1 className={styles.profileName}>{profile.currentName}</h1>
@@ -11,8 +15,8 @@ const ProfileSummary = ({ profile }) => {
           <p className={styles.statLabel}>Total Matches</p>
         </div>
         <div className={styles.statItem}>
-          <p className={`${styles.statValue} ${styles.textGreen}`}>
-            {Math.round((profile.winCount / profile.matchesCount) * 100)}%
+          <p className={styles.statValue} style={{ color: winRateColor }}>
+            {winRate}%
           </p>
           <p className={styles.statLabel}>Win Rate</p>
         </div>

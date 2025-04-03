@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
-import styles from './TekkenStatsProfile.module.css';
+import styles from '../styles/TekkenStatsProfile.module.css';
 import Header from './Header';
 import ProfileSummary from './profile/ProfileSummary';
 import MatchHistory from './profile/MatchHistory';
@@ -31,7 +31,7 @@ const TekkenStatsProfile = () => {
   } = usePlayerData(tekkenId, filters);
 
   if (error) return <div className={styles.error}>Error: {error}</div>;
-  if (!profile) return <div className={styles.noData}>No profile data</div>;
+  if (!profile) return <div className={styles.noData}></div>;
 
   return (
     <div className={styles.app}>

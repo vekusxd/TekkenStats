@@ -1,0 +1,38 @@
+.profileSummary {
+    background-color: #111827;
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+}
+
+.profileName {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.statsGrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+}
+
+@media (max-width: 768px) {
+    .statsGrid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.statItem {
+    text-align: center;
+}
+
+.statValue {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+}
+
+.statLabel {
+    color: #9CA3AF;
+    font-size: 0.875rem;
+}

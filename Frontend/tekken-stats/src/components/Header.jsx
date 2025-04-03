@@ -1,19 +1,22 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { usePlayerSearch } from '../hooks/usePlayerSearch';
-import styles from './TekkenStatsApp.module.css';
+import { useInlineSearch } from '../hooks/useInlineSearch';
+import styles from '../styles/TekkenStatsApp.module.css';
 
 const Header = () => {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [inputError, setInputError] = useState(null);
   const navigate = useNavigate();
-  const { searchPlayers } = usePlayerSearch();
-
-  const handleInputChange = (e) => {
-    const value = e.target.value;
-    setSearchQuery(value);
-    setInputError(null);
-  };
+  const {
+    searchQuery,
+    inputError,
+    suggestions,
+    showSuggestions,
+    loading,
+    searchPlayers,
+    handleInputChange,
+    setSearchQuery,
+    setShowSuggestions,
+    setInputError
+  } = useInlineSearch();
 
   const handleSearch = async (e) => {
     e.preventDefault();
@@ -21,10 +24,17 @@ const Header = () => {
       const results = await searchPlayers(searchQuery);
       if (results.length > 0) {
         navigate(`/${results[0].tekkenId}`);
+        setSearchQuery('');
       }
     } catch (error) {
       setInputError(error.message);
     }
+  };
+
+  const handlePlayerClick = (player) => {
+    setSearchQuery('');
+    navigate(`/${player.tekkenId}`);
+    setShowSuggestions(false);
   };
 
   return (
@@ -40,24 +50,39 @@ const Header = () => {
                   placeholder="Search player..." 
                   className={`${styles.headerSearchInput} ${inputError ? styles.inputError : ''}`}
                   value={searchQuery}
-                  onChange={handleInputChange}
+                  onChange={(e) => handleInputChange(e.target.value)}
+                  onFocus={() => searchQuery.length > 0 && setShowSuggestions(true)}
+                  onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
                 />
-                <button 
-                  type="submit" 
-                  className={styles.headerSearchIcon}
-                  disabled={!searchQuery.trim()}
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <circle cx="11" cy="11" r="8"></circle>
-                    <path d="m21 21-4.3-4.3"></path>
-                  </svg>
-                </button>
+                {inputError && (
+                  <div className={styles.headerError}>
+                    {inputError}
+                  </div>
+                )}
+                {showSuggestions && suggestions.length > 0 && (
+                  <div className={styles.headerSuggestionsDropdown}>
+                    {suggestions.map(player => (
+                      <div 
+                        key={player.tekkenId}
+                        className={styles.headerSuggestionItem}
+                        onClick={() => handlePlayerClick(player)}
+                      >
+                        {player.name}
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
-              {inputError && (
-                <div className={styles.headerError}>
-                  {inputError}
-                </div>
-              )}
+              <button 
+                type="submit" 
+                className={styles.headerSearchIcon}
+                disabled={loading || !searchQuery.trim()}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <path d="m21 21-4.3-4.3"></path>
+                </svg>
+              </button>
             </form>
           </div>
         </div>

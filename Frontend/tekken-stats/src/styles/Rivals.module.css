@@ -1,0 +1,67 @@
+.tabContent {
+    padding: 1.5rem;
+}
+
+.rivalsList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.rivalLink {
+    text-decoration: none;
+    color: inherit;
+}
+
+.matchItem {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem;
+    background-color: #1f2937;
+    border-radius: 0.5rem;
+}
+
+.rivalInfo {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.rivalTextInfo {
+    flex: 1;
+}
+
+.opponentName {
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    color: #fff;
+}
+
+.matchDetails {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: #9CA3AF;
+}
+
+.winRateLabel {
+    color: #9CA3AF;
+}
+
+.rivalStats {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.textF {
+    font-weight: 600;
+}
+
+.noRivals {
+    color: #9CA3AF;
+    text-align: center;
+    padding: 2rem;
+}
