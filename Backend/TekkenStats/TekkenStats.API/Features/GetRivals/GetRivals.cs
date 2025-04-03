@@ -9,6 +9,20 @@ using TekkenStats.DataAccess;
 
 namespace TekkenStats.API.Features.GetRivals;
 
+public class GetRivalsRequest
+{
+    [FromQuery] public int? PlayerCharacterId { get; init; }
+    [FromQuery] public int? OpponentCharacterId { get; init; }
+    [FromQuery] public int? PageSize { get; set; }
+    [FromQuery] public int? PageNumber { get; set; }
+}
+
+public class GetRivalsResponse
+{
+    public required List<Rival> Data { get; init; }
+    public int Count { get; init; }
+}
+
 public class GetRivals : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
@@ -20,7 +34,7 @@ public class GetRivals : IEndpoint
         string tekkenId,
         [AsParameters] GetRivalsRequest request,
         IValidator<GetRivalsRequest> validator,
-        MongoDatabase mongoDatabase,
+        MongoDatabase db,
         CharacterStore characterStore)
     {
         request.PageNumber ??= 1;
@@ -33,7 +47,8 @@ public class GetRivals : IEndpoint
             return TypedResults.ValidationProblem(validationResult.ToDictionary());
 
 
-        var collection = mongoDatabase.Db.GetCollection<BsonDocument>(Player.CollectionName);
+        var collection = db.Players;
+        
         var pipeline = new List<BsonDocument>
         {
             new("$match", new BsonDocument("_id", tekkenId)),
@@ -99,14 +114,10 @@ public class GetRivals : IEndpoint
         if (result == null)
             return TypedResults.NotFound();
 
-        var data = result.Select(c => new Rival
-        {
-            TekkenId = c.TekkenId,
-            Name = c.Name,
-            Wins = c.Wins,
-            Losses = c.Losses,
-            TotalMatches = c.TotalMatches,
-        }).ToList();
+        var data = result
+            .Select(c => c
+                .ToRival())
+            .ToList();
 
         return TypedResults.Ok(new GetRivalsResponse
         {
@@ -114,20 +125,6 @@ public class GetRivals : IEndpoint
             Count = totalCount
         });
     }
-}
-
-public class GetRivalsRequest
-{
-    [FromQuery] public int? PlayerCharacterId { get; init; }
-    [FromQuery] public int? OpponentCharacterId { get; init; }
-    [FromQuery] public int? PageSize { get; set; }
-    [FromQuery] public int? PageNumber { get; set; }
-}
-
-public class GetRivalsResponse
-{
-    public required List<Rival> Data { get; init; }
-    public int Count { get; init; }
 }
 
 public class PlayerOpponentStats

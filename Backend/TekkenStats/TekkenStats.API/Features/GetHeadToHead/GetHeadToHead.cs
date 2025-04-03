@@ -9,6 +9,24 @@ using TekkenStats.DataAccess;
 
 namespace TekkenStats.API.Features.GetHeadToHead;
 
+public class GetHeadToHeadRequest
+{
+    [FromQuery] public int? PageSize { get; set; } = 10;
+    [FromQuery] public int? PageNumber { get; set; } = 1;
+    [FromQuery] public int? CharacterId { get; init; }
+    [FromQuery] public int? OpponentCharacterId { get; init; }
+}
+
+public class GetHeadToHeadResponse
+{
+    public List<MatchResponse> Matches { get; set; } = [];
+    public int TotalMatches { get; set; }
+    public int WinCount { get; init; }
+    public int LossCount { get; init; }
+    public double ChallengerWinRate => TotalMatches != 0 ? Math.Round((double)WinCount / TotalMatches * 100, 2) : 0;
+    public double OpponentWinRate => TotalMatches != 0 ? 100 - ChallengerWinRate : 0;
+}
+
 public class GetHeadToHead : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
@@ -33,7 +51,7 @@ public class GetHeadToHead : IEndpoint
         if (!validationResult.IsValid)
             return TypedResults.ValidationProblem(validationResult.ToDictionary());
 
-        var collection = db.Db.GetCollection<Player>(Player.CollectionName);
+        var collection = db.Players;
 
         var matchesFilter = BuildMatchesFilter(request.CharacterId, request.OpponentCharacterId, opponentTekkenId);
 
@@ -109,41 +127,7 @@ public class GetHeadToHead : IEndpoint
         if (result == null)
             return TypedResults.NotFound();
 
-        var response = new GetHeadToHeadResponse
-        {
-            Matches = result.Matches.Select(m => new MatchResponse
-            {
-                BattleId = m.BattleId,
-                Date = m.Date,
-                Winner = m.Winner,
-                GameVersion = m.GameVersion,
-                Challenger = new ChallengerInfoResponse
-                {
-                    TekkenId = tekkenId,
-                    Name = m.Challenger.Name,
-                    CharacterId = m.Challenger.CharacterId,
-                    CharacterName = characterStore.GetCharacter(m.Challenger.CharacterId).Name,
-                    Rounds = m.Challenger.Rounds,
-                    RatingBefore = m.Challenger.RatingBefore,
-                    RatingChange = m.Challenger.RatingChange,
-                    CharacterImgURL = characterStore.GetCharacter(m.Challenger.CharacterId).ImgURL
-                },
-                Opponent = new ChallengerInfoResponse
-                {
-                    TekkenId = m.Opponent.TekkenId,
-                    Name = m.Opponent.Name,
-                    CharacterId = m.Opponent.CharacterId,
-                    CharacterName = characterStore.GetCharacter(m.Opponent.CharacterId).Name,
-                    Rounds = m.Opponent.Rounds,
-                    RatingBefore = m.Opponent.RatingBefore,
-                    RatingChange = m.Opponent.RatingChange,
-                    CharacterImgURL = characterStore.GetCharacter(m.Opponent.CharacterId).ImgURL,
-                }
-            }).ToList(),
-            TotalMatches = result.TotalMatches,
-            WinCount = result.WinCount,
-            LossCount = result.LossCount
-        };
+        var response = result.ToHeadToHeadResponse(characterStore);
 
         return TypedResults.Ok(response);
     }
@@ -188,24 +172,6 @@ public class GetHeadToHead : IEndpoint
             ? conditions[0]
             : new BsonDocument("$and", new BsonArray(conditions));
     }
-}
-
-public class GetHeadToHeadRequest
-{
-    [FromQuery] public int? PageSize { get; set; } = 10;
-    [FromQuery] public int? PageNumber { get; set; } = 1;
-    [FromQuery] public int? CharacterId { get; init; }
-    [FromQuery] public int? OpponentCharacterId { get; init; }
-}
-
-public class GetHeadToHeadResponse
-{
-    public List<MatchResponse> Matches { get; set; } = [];
-    public int TotalMatches { get; set; }
-    public int WinCount { get; init; }
-    public int LossCount { get; init; }
-    public double ChallengerWinRate => TotalMatches != 0 ? Math.Round((double)WinCount / TotalMatches * 100, 2) : 0;
-    public double OpponentWinRate => TotalMatches != 0 ? 100 - ChallengerWinRate : 0;
 }
 
 public class HeadToHeadMatchesProjection

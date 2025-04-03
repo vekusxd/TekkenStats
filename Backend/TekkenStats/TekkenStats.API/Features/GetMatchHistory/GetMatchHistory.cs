@@ -9,6 +9,21 @@ using TekkenStats.DataAccess;
 
 namespace TekkenStats.API.Features.GetMatchHistory;
 
+public class GetMatchHistoryRequest
+{
+    [FromQuery] public int? PageSize { get; set; } = 10;
+    [FromQuery] public int? PageNumber { get; set; } = 1;
+    [FromQuery] public int? CharacterId { get; init; }
+    [FromQuery] public int? OpponentCharacterId { get; init; }
+}
+
+public class GetMatchHistoryResponse
+{
+    public List<MatchResponse> Matches { get; set; } = [];
+    public int TotalMatches { get; set; }
+}
+
+
 public class GetMatchHistory : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
@@ -29,7 +44,7 @@ public class GetMatchHistory : IEndpoint
         if (!validationResult.IsValid)
             return TypedResults.ValidationProblem(validationResult.ToDictionary());
 
-        var collection = db.Db.GetCollection<Player>(Player.CollectionName);
+        var collection = db.Players;
 
         var pageNumber = request.PageNumber ?? 1;
         var pageSize = request.PageSize ?? 10;
@@ -108,40 +123,9 @@ public class GetMatchHistory : IEndpoint
 
         if (player == null)
             return TypedResults.NotFound();
-
-        var result = new GetMatchHistoryResponse
-        {
-            TotalMatches = player.TotalMatches,
-            Matches = player.Matches.Select(m => new MatchResponse
-            {
-                BattleId = m.BattleId,
-                Date = m.Date,
-                Winner = m.Winner,
-                GameVersion = m.GameVersion,
-                Challenger = new ChallengerInfoResponse
-                {
-                    TekkenId = tekkenId,
-                    Name = m.Challenger.Name,
-                    CharacterId = m.Challenger.CharacterId,
-                    CharacterName = characterStore.GetCharacter(m.Challenger.CharacterId).Name,
-                    Rounds = m.Challenger.Rounds,
-                    RatingBefore = m.Challenger.RatingBefore,
-                    RatingChange = m.Challenger.RatingChange,
-                    CharacterImgURL = characterStore.GetCharacter(m.Challenger.CharacterId).ImgURL
-                },
-                Opponent = new ChallengerInfoResponse
-                {
-                    TekkenId = m.Opponent.TekkenId,
-                    Name = m.Opponent.Name,
-                    CharacterId = m.Opponent.CharacterId,
-                    CharacterName = characterStore.GetCharacter(m.Opponent.CharacterId).Name,
-                    Rounds = m.Opponent.Rounds,
-                    RatingBefore = m.Opponent.RatingBefore,
-                    RatingChange = m.Opponent.RatingChange,
-                    CharacterImgURL = characterStore.GetCharacter(m.Opponent.CharacterId).ImgURL,
-                }
-            }).ToList(),
-        };
+        
+        var result = player.ToMatchHistoryResponse(characterStore);
+        
         return TypedResults.Ok(result);
     }
 
@@ -187,23 +171,9 @@ public class GetMatchHistory : IEndpoint
     }
 }
 
-public class GetMatchHistoryRequest
-{
-    [FromQuery] public int? PageSize { get; set; } = 10;
-    [FromQuery] public int? PageNumber { get; set; } = 1;
-    [FromQuery] public int? CharacterId { get; init; }
-    [FromQuery] public int? OpponentCharacterId { get; init; }
-}
-
 public class PlayerMatchesProjection
 {
     public List<Match> Matches { get; set; } = [];
-    public int TotalMatches { get; set; }
-}
-
-public class GetMatchHistoryResponse
-{
-    public List<MatchResponse> Matches { get; set; } = [];
     public int TotalMatches { get; set; }
 }
 

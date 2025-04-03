@@ -9,6 +9,18 @@ using TekkenStats.DataAccess;
 
 namespace TekkenStats.API.Features.GetNames;
 
+public class GetNamesRequest
+{
+    [FromQuery] public int? Amount { get; init; } = 10;
+    [FromQuery] public required string StartsWith { get; init; }
+}
+
+public class GetNamesResponse
+{
+    [BsonElement("_id")] public required string TekkenId { get; init; }
+    public required string Name { get; init; }
+}
+
 public class GetNames : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
@@ -19,13 +31,13 @@ public class GetNames : IEndpoint
     private async Task<Results<Ok<List<GetNamesResponse>>, ValidationProblem>> Handler(
         IValidator<GetNamesRequest> validator,
         [AsParameters] GetNamesRequest request,
-        MongoDatabase database)
+        MongoDatabase db)
     {
         var validation = await validator.ValidateAsync(request);
         if (!validation.IsValid)
             return TypedResults.ValidationProblem(validation.ToDictionary());
 
-        var collection = database.Db.GetCollection<Player>(Player.CollectionName);
+        var collection = db.Players;
 
         var names = await collection
             .Aggregate()
@@ -58,16 +70,4 @@ public class GetNames : IEndpoint
         [BsonElement("_id")] public required string Id { get; set; }
         [BsonElement("Names")] public required Name Name { get; set; }
     }
-}
-
-public class GetNamesRequest
-{
-    [FromQuery] public int? Amount { get; init; } = 10;
-    [FromQuery] public required string StartsWith { get; init; }
-}
-
-public class GetNamesResponse
-{
-    [BsonElement("_id")] public required string TekkenId { get; init; }
-    public required string Name { get; init; }
 }

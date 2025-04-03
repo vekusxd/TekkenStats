@@ -8,6 +8,17 @@ using TekkenStats.DataAccess;
 
 namespace TekkenStats.API.Features.GetMatchups;
 
+public class MatchupsResponse
+{
+    public int OpponentCharacterId { get; init; }
+    public required string CharacterName { get; init; }
+    public required string CharacterImgURL { get; init; }
+    public int TotalMatches { get; init; }
+    public int Wins { get; init; }
+    public int Losses { get; init; }
+    public double WinRate => Math.Round((double)Wins / TotalMatches * 100, 2);
+}
+
 public class GetMatchups : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
@@ -18,15 +29,16 @@ public class GetMatchups : IEndpoint
     private async Task<Results<Ok<List<MatchupsResponse>>, NotFound>> Handler(
         string tekkenId,
         [FromQuery] int? playerCharacterId,
-        MongoDatabase mongoDatabase,
+        MongoDatabase db,
         CharacterStore characterStore)
     {
-        var collection = mongoDatabase.Db.GetCollection<BsonDocument>(Player.CollectionName);
-        var pipeline = new List<BsonDocument>();
-
-        pipeline.Add(new BsonDocument("$match", new BsonDocument("_id", tekkenId)));
-
-        pipeline.Add(new BsonDocument("$unwind", "$Matches"));
+        var collection = db.Players;
+        
+        var pipeline = new List<BsonDocument>
+        {
+            new BsonDocument("$match", new BsonDocument("_id", tekkenId)),
+            new BsonDocument("$unwind", "$Matches")
+        };
 
         if (playerCharacterId.HasValue)
         {
@@ -64,15 +76,10 @@ public class GetMatchups : IEndpoint
         if (result == null)
             return TypedResults.NotFound();
 
-        return TypedResults.Ok(result.Select(c => new MatchupsResponse
-        {
-            OpponentCharacterId = c.OpponentCharacterId,
-            Wins = c.Wins,
-            Losses = c.Losses,
-            TotalMatches = c.TotalMatches,
-            CharacterName = characterStore.GetCharacter(c.OpponentCharacterId).Name,
-            CharacterImgURL = characterStore.GetCharacter(c.OpponentCharacterId).ImgURL
-        }).ToList());
+        return TypedResults.Ok(result
+            .Select(c => c
+                .ToMatchupResponse(characterStore))
+            .ToList());
     }
 }
 
@@ -82,15 +89,4 @@ public class PlayerMatchStats
     public int TotalMatches { get; init; }
     public int Wins { get; init; }
     public int Losses { get; init; }
-}
-
-public class MatchupsResponse
-{
-    public int OpponentCharacterId { get; init; }
-    public required string CharacterName { get; init; }
-    public required string CharacterImgURL { get; init; }
-    public int TotalMatches { get; init; }
-    public int Wins { get; init; }
-    public int Losses { get; init; }
-    public double WinRate => Math.Round((double)Wins / TotalMatches * 100, 2);
 }

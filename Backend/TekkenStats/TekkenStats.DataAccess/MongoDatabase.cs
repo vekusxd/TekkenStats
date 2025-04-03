@@ -15,6 +15,7 @@ public class MongoDatabase
     }
     
     public IMongoDatabase Db => _mongoClient.GetDatabase(_dbName);
+    public IMongoCollection<Player> Players => Db.GetCollection<Player>(Player.CollectionName);
     
     public  async Task InitIndexes()
     {

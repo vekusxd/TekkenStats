@@ -1,0 +1,36 @@
+@startgantt Gantt
+language ru
+ 
+project starts the 2025-03-20
+ 
+[Анализ] requires 3 days
+[Базовая документация] requires 2 days
+[Разработка тех. задания] requires 3 days
+[Проектирование] requires 4 days
+[Разработка прототипа] requires 7 days
+[Дополнение документации] requires 3 days
+[Исправление недоточетов] requires 5 days
+[Заполнения дневника] requires 1 days
+[Сдача работы] requires 1 days
+ 
+[Базовая документация] starts 2 day before [Анализ]'s end
+[Проектирование] starts at [Базовая документация]'s end
+[Разработка прототипа] starts at [Проектирование]'s end
+[Исправление недоточетов] starts at [Разработка прототипа]'s end
+[Заполнения дневника] starts at [Исправление недоточетов]'s end
+[Сдача работы] starts at [Заполнения дневника]'s end
+[Разработка тех. задания] starts 1 day after [Проектирование]`s start
+[Дополнение документации] starts at [Разработка прототипа]`s start
+'Стили
+ 
+[Анализ] is colored in red
+[Базовая документация] is colored in blue
+[Проектирование] is colored in green
+[Разработка прототипа] is colored in yellow
+[Исправление недоточетов] is colored in orange
+[Заполнения дневника] is colored in purple
+[Сдача работы] is colored in pink
+[Разработка тех. задания] is colored in violet
+[Дополнение документации] is colored in lightBlue
+ 
+@endgantt

@@ -48,12 +48,6 @@ public class Seeder
 
         var newCharacters = data
             .Where(item => !existingIds.Contains(item.Id))
-            .Select(item => new Character
-            {
-                Id = item.Id,
-                Name = item.Name,
-                ImgURL = item.ImgURL
-            })
             .ToList();
 
         if (newCharacters.Count != 0)

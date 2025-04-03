@@ -9,6 +9,23 @@ using TekkenStats.DataAccess;
 
 namespace TekkenStats.API.Features.GetPlayerProfile;
 
+public class GetPlayerProfileRequest
+{
+    [FromRoute] public required string TekkenId { get; set; }
+}
+
+public class GetPlayerProfileResponse
+{
+    public required string TekkenId { get; init; }
+    public required string CurrentName { get; init; }
+    public long Power { get; init; }
+    public int MatchesCount { get; init; }
+    public int WinCount { get; init; }
+    public int LossCount { get; init; }
+    public List<CharacterResponse> Characters { get; init; } = [];
+    public List<Name> Names { get; init; } = [];
+}
+
 public class GetPlayerProfile : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
@@ -19,7 +36,7 @@ public class GetPlayerProfile : IEndpoint
     private async Task<Results<Ok<GetPlayerProfileResponse>, NotFound, ValidationProblem>> Handler(
         [AsParameters] GetPlayerProfileRequest request,
         IValidator<GetPlayerProfileRequest> validator,
-        MongoDatabase database,
+        MongoDatabase db,
         CharacterStore characterStore
     )
     {
@@ -28,7 +45,7 @@ public class GetPlayerProfile : IEndpoint
         if (!validationResult.IsValid)
             return TypedResults.ValidationProblem(validationResult.ToDictionary());
 
-        var collection = database.Db.GetCollection<Player>(Player.CollectionName);
+        var collection = db.Players;
 
         var player = await collection.Aggregate()
             .Match(p => p.TekkenId == request.TekkenId)
@@ -78,38 +95,11 @@ public class GetPlayerProfile : IEndpoint
 
         if (player == null)
             return TypedResults.NotFound();
-
-        var result = new GetPlayerProfileResponse
-        {
-            TekkenId = request.TekkenId,
-            CurrentName = player.CurrentName,
-            LossCount = player.LossCount,
-            WinCount = player.WinCount,
-            MatchesCount = player.MatchesCount,
-            Names = player.Names,
-            Power = player.Power,
-            Characters = player.Characters.Select(c => new CharacterResponse
-            {
-                CharacterId = c.CharacterId,
-                CharacterName = characterStore.GetCharacter(c.CharacterId).Name ??
-                                throw new NullReferenceException($"Character with id: {c.CharacterId} not found"),
-                MatchesCount = c.MatchesCount,
-                WinCount = c.WinCount,
-                LossCount = c.LossCount,
-                Rating = c.Rating,
-                LastPlayed = c.LastPlayed,
-                ImgURL = characterStore.GetCharacter(c.CharacterId).ImgURL ??
-                         throw new Exception($"Character with id: {c.CharacterId} not found")
-            }).ToList(),
-        };
+        
+        var result = player.ToGetPlayerProfileResponse(characterStore, request.TekkenId);
 
         return TypedResults.Ok(result);
     }
-}
-
-public class GetPlayerProfileRequest
-{
-    [FromRoute] public required string TekkenId { get; set; }
 }
 
 public class GetPlayerProfileProjection
@@ -121,18 +111,6 @@ public class GetPlayerProfileProjection
     public int LossCount { get; set; }
     public List<CharacterInfo> Characters { get; init; } = [];
     public List<Name> Names { get; set; } = [];
-}
-
-public class GetPlayerProfileResponse
-{
-    public required string TekkenId { get; init; }
-    public required string CurrentName { get; init; }
-    public long Power { get; init; }
-    public int MatchesCount { get; init; }
-    public int WinCount { get; init; }
-    public int LossCount { get; init; }
-    public List<CharacterResponse> Characters { get; init; } = [];
-    public List<Name> Names { get; init; } = [];
 }
 
 public class CharacterResponse
