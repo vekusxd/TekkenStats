@@ -24,6 +24,7 @@ const TekkenStatsProfile = () => {
   const { 
     profile, 
     matches, 
+    totalMatches,
     rivals, 
     rivalsProfiles, 
     opponentCharacters, 
@@ -67,6 +68,7 @@ const TekkenStatsProfile = () => {
                 {activeTab === 'matchHistory' && (
                   <MatchHistory 
                     matches={matches} 
+                    totalMatches={totalMatches}
                     filters={filters} 
                     setFilters={setFilters} 
                     profile={profile}
