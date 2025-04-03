@@ -5,6 +5,7 @@ export const usePlayerData = (playerId, filters) => {
   const [playerData, setPlayerData] = useState({
     profile: null,
     matches: [],
+    totalMatches: 0,
     opponentCharacters: [],
     rivals: [],
     loading: true,
@@ -14,7 +15,11 @@ export const usePlayerData = (playerId, filters) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        setPlayerData(prev => ({ ...prev, loading: true }));
+        setPlayerData(prev => ({ 
+          ...prev, 
+          loading: true,
+          matches: filters.pageNumber === 1 ? [] : prev.matches
+        }));
 
         const [profileRes, matchupsRes] = await Promise.all([
           tekkenApi.fetchProfile(playerId),
@@ -27,7 +32,7 @@ export const usePlayerData = (playerId, filters) => {
         })).sort((a, b) => a.characterName.localeCompare(b.characterName));
 
         const matchesParams = {
-          PageSize: Math.min(filters.pageSize, 50),
+          PageSize: filters.pageSize,
           PageNumber: filters.pageNumber,
           CharacterId: filters.characterId,
           OpponentCharacterId: filters.opponentCharacterId
@@ -56,15 +61,18 @@ export const usePlayerData = (playerId, filters) => {
           })
         );
 
-        setPlayerData({
+        setPlayerData(prev => ({
           profile: profileRes.data,
-          matches: matchesRes.data.matches,
+          matches: filters.pageNumber === 1 
+            ? matchesRes.data.matches 
+            : [...prev.matches, ...matchesRes.data.matches],
+          totalMatches: matchesRes.data.totalMatches || 0,
           opponentCharacters: opponents,
           rivals: rivalsRes.data.data,
           rivalsProfiles: profilesData,
           loading: false,
           error: null
-        });
+        }));
       } catch (err) {
         setPlayerData(prev => ({
           ...prev,

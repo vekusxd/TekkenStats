@@ -4,12 +4,23 @@ import styles from '../../styles/MatchHistory.module.css';
 import Filters from './Filters';
 import { BASE_URL } from '../../config/baseUrl';
 
-const MatchHistory = ({ matches, filters, setFilters, profile, opponentCharacters }) => {
+const MatchHistory = ({ matches, totalMatches, filters, setFilters, profile, opponentCharacters }) => {
+  const navigate = useNavigate();
+
+  const handleLoadMore = () => {
+    setFilters(prev => ({
+      ...prev,
+      pageNumber: prev.pageNumber + 1
+    }));
+  };
+
+  const hasMoreMatches = matches.length < totalMatches;
+
   return (
     <div className={styles.tabContent}>
       <Filters 
         filters={filters} 
-        setFilters={setFilters} 
+        setFilters={(newFilters) => setFilters({...newFilters, pageNumber: 1})}
         profile={profile} 
         playerFilterKey="characterId"
         opponentCharacters={opponentCharacters}
@@ -17,22 +28,22 @@ const MatchHistory = ({ matches, filters, setFilters, profile, opponentCharacter
       
       <div className={styles.matchesList}>
         {matches.map(match => (
-          <MatchItem key={match.battleId} match={match} />
+          <MatchItem key={match.battleId} match={match} navigate={navigate} />
         ))}
-        <button 
-          className={styles.loadMoreButton}
-          onClick={() => setFilters({...filters, pageSize: filters.pageSize + 10})}
-        >
-          Load More Matches
-        </button>
+        {hasMoreMatches && (
+          <button 
+            className={styles.loadMoreButton}
+            onClick={handleLoadMore}
+          >
+            Load More Matches
+          </button>
+        )}
       </div>
     </div>
   );
 };
 
-const MatchItem = ({ match }) => {
-  const navigate = useNavigate();
-  
+const MatchItem = ({ match, navigate }) => {
   const challengerImg = `${BASE_URL}/${match.challenger.characterImgURL}`;
   const opponentImg = `${BASE_URL}/${match.opponent.characterImgURL}`;
 
