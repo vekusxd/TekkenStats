@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import styles from '../styles/TekkenStatsProfile.module.css';
 import Header from './Header';
@@ -20,6 +20,17 @@ const TekkenStatsProfile = () => {
     pageSize: 10,
     pageNumber: 1
   });
+
+  useEffect(() => {
+    setFilters({
+      playerCharacterId: null,
+      characterId: null,
+      opponentCharacterId: null,
+      pageSize: 10,
+      pageNumber: 1
+    });
+    setActiveTab('matchHistory');
+  }, [tekkenId]);
 
   const { 
     profile, 
