@@ -1,17 +1,22 @@
-﻿using MongoDB.Driver;
+﻿using Elastic.Clients.Elasticsearch;
+using MongoDB.Driver;
 using TekkenStats.Core.Contracts;
 using TekkenStats.Core.Entities;
 using TekkenStats.DataAccess;
+using TekkenStats.DataAccess.Models;
+using Name = TekkenStats.Core.Entities.Name;
 using Player = TekkenStats.Core.Entities.Player;
 
 namespace TekkenStats.ProcessingService;
 
 public class ResponseProcessor
 {
+    private readonly ElasticSearch _elasticSearch;
     private readonly IMongoDatabase _db;
 
-    public ResponseProcessor(MongoDatabase database)
+    public ResponseProcessor(MongoDatabase database, ElasticSearch elasticSearch)
     {
+        _elasticSearch = elasticSearch;
         _db = database.Db;
     }
 
@@ -77,7 +82,10 @@ public class ResponseProcessor
             Match = secondPlayerMatch
         });
 
-        await Task.WhenAll(firstPlayerUpdate, secondPlayerUpdate);
+        var firstPlayerNameIndex = _elasticSearch.IndexPlayer(response.P1PolarisId, response.P1Name);
+        var secondPlayerNameIndex = _elasticSearch.IndexPlayer(response.P2PolarisId, response.P2Name);
+
+        await Task.WhenAll(firstPlayerUpdate, secondPlayerUpdate, firstPlayerNameIndex, secondPlayerNameIndex);
     }
 
     private async Task UpdatePlayer(PlayerUpdate player)

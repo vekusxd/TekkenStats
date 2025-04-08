@@ -16,6 +16,7 @@ builder.Services.AddScoped<ResponseProcessor>();
 builder.Services.Configure<MongoOptions>(builder.Configuration.GetRequiredSection(MongoOptions.Section));
 
 builder.Services.AddMongoDb(builder.Configuration);
+builder.Services.AddElasticSearch(builder.Configuration);
 
 builder.Services.AddMassTransit(configurator =>
 {
@@ -44,11 +45,14 @@ builder.Services.AddMassTransit(configurator =>
 
 var host = builder.Build();
 
+
 using (var scope = host.Services.CreateScope())
 {
     var mongoDb = scope.ServiceProvider.GetRequiredService<MongoDatabase>();
     await mongoDb.InitIndexes();
     var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    var elasticSearch = scope.ServiceProvider.GetRequiredService<ElasticSearch>();
+    await elasticSearch.InitIndexes();
     dbContext.Database.Migrate();
 }
 

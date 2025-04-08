@@ -21,6 +21,7 @@ builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
 builder.Services.AddMongoDb(builder.Configuration);
 builder.Services.AddMemoryCache();
 builder.Services.AddScoped<CharacterStore>();
+builder.Services.AddElasticSearch(builder.Configuration);
 
 builder.Services.AddCors(opts =>
     opts.AddDefaultPolicy(policyBuilder => policyBuilder
@@ -38,11 +39,14 @@ using (var scope = app.Services.CreateScope())
 {
     var seeder = scope.ServiceProvider.GetRequiredService<Seeder>();
     var mongoDb = scope.ServiceProvider.GetRequiredService<MongoDatabase>();
+    var elasticSearch = scope.ServiceProvider.GetRequiredService<ElasticSearch>();
+    await elasticSearch.InitIndexes();
     await mongoDb.InitIndexes();
     await seeder.Migrate();
     await seeder.SeedDb();
     await seeder.InitCache();
 }
+
 
 app.MapOpenApi();
 app.MapScalarApiReference();

@@ -1,4 +1,6 @@
 ﻿using System.Text.RegularExpressions;
+using Elastic.Clients.Elasticsearch;
+using Elastic.Clients.Elasticsearch.Nodes;
 using FluentValidation;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
@@ -6,6 +8,8 @@ using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
 using TekkenStats.Core.Entities;
 using TekkenStats.DataAccess;
+using TekkenStats.DataAccess.Models;
+using Name = TekkenStats.Core.Entities.Name;
 
 namespace TekkenStats.API.Features.GetNames;
 
@@ -17,7 +21,7 @@ public class GetNamesRequest
 
 public class GetNamesResponse
 {
-    [BsonElement("_id")] public required string TekkenId { get; init; }
+    public required string TekkenId { get; init; }
     public required string Name { get; init; }
 }
 
@@ -31,43 +35,29 @@ public class GetNames : IEndpoint
     private async Task<Results<Ok<List<GetNamesResponse>>, ValidationProblem>> Handler(
         IValidator<GetNamesRequest> validator,
         [AsParameters] GetNamesRequest request,
-        MongoDatabase db)
+        MongoDatabase db,
+        ElasticSearch elasticSearch
+    )
     {
         var validation = await validator.ValidateAsync(request);
         if (!validation.IsValid)
             return TypedResults.ValidationProblem(validation.ToDictionary());
 
-        var collection = db.Players;
 
-        var names = await collection
-            .Aggregate()
-            .Project<Player, ProjectedPlayer>(p => new ProjectedPlayer
-            {
-                Id = p.TekkenId,
-                Names = p.Names
-            }).Unwind(p => p.Names,
-                new AggregateUnwindOptions<UnwoundPlayer> { PreserveNullAndEmptyArrays = true })
-            .Project<UnwoundPlayer, GetNamesResponse>(p => new GetNamesResponse
-            {
-                TekkenId = p.Id,
-                Name = p.Name.PlayerName,
-            })
-            .Match(p => Regex.IsMatch(p.Name, $"^{request.StartsWith}", RegexOptions.IgnoreCase))
-            .Limit(15)
-            .ToListAsync();
+        var response = await elasticSearch.Client.SearchAsync<IndexedPlayer>(s => s
+            .Index(IndexedPlayer.IndexName)
+            .Size(request.Amount)
+            .Query(q => q.Wildcard(w => w
+                .Field(f => f.Name)
+                .Value($"*{request.StartsWith}*")
+                .CaseInsensitive())));
 
-        return TypedResults.Ok(names);
-    }
+        var result = response.Documents.Select(p => new GetNamesResponse
+        {
+            TekkenId = p.TekkenId,
+            Name = p.Name,
+        }).ToList();
 
-    private class ProjectedPlayer
-    {
-        [BsonElement("_id")] public required string Id { get; set; }
-        public required List<Name> Names { get; set; }
-    }
-
-    private class UnwoundPlayer
-    {
-        [BsonElement("_id")] public required string Id { get; set; }
-        [BsonElement("Names")] public required Name Name { get; set; }
+        return TypedResults.Ok(result);
     }
 }

@@ -8,6 +8,7 @@
       ConnectionStrings__DefaultConnection: "Server=postgres;Port=5432;Database=tekkenstatsDb;User Id=postgres;Password=root;Include Error Detail=true"
       MongoOptions__ConnectionString: "mongodb://admin:root@mongo:27017"
       MongoOptions__DbName: "TekkenStats"
+      ElasticOptions__Url: "http://elastic:9200"
     build:
       context: .
       dockerfile: TekkenStats.API/Dockerfile
@@ -23,6 +24,7 @@
       RabbitMQOptions__Password: "guest"
       MongoOptions__ConnectionString: "mongodb://admin:root@mongo:27017"
       MongoOptions__DbName: "TekkenStats"
+      ElasticOptions__Url: "http://elastic:9200"
     build:
       context: .
       dockerfile: TekkenStats.ProcessingService/Dockerfile
@@ -48,10 +50,23 @@
     networks:
       - app-network
 
+  elastic:
+    image: elasticsearch:8.17.4
+    container_name: tekkenstats_elasticsearch
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+    volumes:
+      - elasticsearch_data:/data/elastic
+    networks:
+      - app-network
+
   postgres:
     container_name: tekkenstats_postgres_db
     image: postgres
-    restart: always
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: root
@@ -66,7 +81,6 @@
   mongo:
     container_name: tekkenstats_mongo_db
     image: mongo
-    restart: always
     environment:
       MONGO_INITDB_ROOT_USERNAME: admin
       MONGO_INITDB_ROOT_PASSWORD: root
@@ -80,7 +94,6 @@
   rabbit:
     image: rabbitmq:3-management
     container_name: tekkenstats_q
-    restart: always
     ports:
       - "5672:5672"
       - "15672:15672"
@@ -98,6 +111,7 @@
 volumes:
   postgres_data:
   mongo_db_data:
+  elasticsearch_data:
 
 networks:
   app-network:
