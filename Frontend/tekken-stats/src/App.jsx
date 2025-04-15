@@ -8,7 +8,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Search />} />
-        <Route path="/:tekkenId" element={<TekkenStatsProfile />} />
+        <Route path="/player/:tekkenId" element={<TekkenStatsProfile />} />
         <Route path="/head-to-head/:tekkenId/:opponentTekkenId" element={<HeadToHead />} />
       </Routes>
     </BrowserRouter>

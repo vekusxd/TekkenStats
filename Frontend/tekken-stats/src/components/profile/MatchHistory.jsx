@@ -1,11 +1,10 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import styles from '../../styles/MatchHistory.module.css';
 import Filters from './Filters';
 import { BASE_URL } from '../../config/baseUrl';
 
 const MatchHistory = ({ matches, totalMatches, filters, setFilters, profile, opponentCharacters }) => {
-  const navigate = useNavigate();
 
   const handleLoadMore = () => {
     setFilters(prev => ({
@@ -28,7 +27,7 @@ const MatchHistory = ({ matches, totalMatches, filters, setFilters, profile, opp
       
       <div className={styles.matchesList}>
         {matches.map(match => (
-          <MatchItem key={match.battleId} match={match} navigate={navigate} />
+          <MatchItem key={match.battleId} match={match} />
         ))}
         {hasMoreMatches && (
           <button 
@@ -43,13 +42,9 @@ const MatchHistory = ({ matches, totalMatches, filters, setFilters, profile, opp
   );
 };
 
-const MatchItem = ({ match, navigate }) => {
+const MatchItem = ({ match }) => {
   const challengerImg = `${BASE_URL}/${match.challenger.characterImgURL}`;
   const opponentImg = `${BASE_URL}/${match.opponent.characterImgURL}`;
-
-  const handlePlayerClick = (playerId) => {
-    navigate(`/${playerId}`);
-  };
 
   const formatUTCDate = (dateString) => {
     const date = new Date(dateString);
@@ -85,10 +80,9 @@ const MatchItem = ({ match, navigate }) => {
             />
           </div>
           <span className={styles.vsText}>VS</span>
-          <div 
+          <Link 
+            to={`/player/${match.opponent.tekkenId}`}
             className={styles.characterImageContainer}
-            onClick={() => handlePlayerClick(match.opponent.tekkenId)}
-            style={{ cursor: 'pointer' }}
           >
             <img 
               src={opponentImg} 
@@ -99,16 +93,15 @@ const MatchItem = ({ match, navigate }) => {
                 e.target.src = '/images/default-character.png';
               }}
             />
-          </div>
+          </Link>
         </div>
         <div className={styles.matchDetailsContainer}>
-          <p 
+          <Link 
+            to={`/player/${match.opponent.tekkenId}`}
             className={styles.opponentName}
-            onClick={() => handlePlayerClick(match.opponent.tekkenId)}
-            style={{ cursor: 'pointer' }}
           >
             {match.opponent.name}
-          </p>
+          </Link>
           <div className={styles.matchDetails}>
             <span className={styles.textGray}>
               {match.challenger.characterName} vs {match.opponent.characterName}

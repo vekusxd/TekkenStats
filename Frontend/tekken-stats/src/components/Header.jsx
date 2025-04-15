@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useInlineSearch } from '../hooks/useInlineSearch';
 import styles from '../styles/TekkenStatsApp.module.css';
 
@@ -23,7 +23,7 @@ const Header = () => {
     try {
       const results = await searchPlayers(searchQuery);
       if (results.length > 0) {
-        navigate(`/${results[0].tekkenId}`);
+        navigate(`/player/${results[0].tekkenId}`);
         setSearchQuery('');
       }
     } catch (error) {
@@ -33,7 +33,7 @@ const Header = () => {
 
   const handlePlayerClick = (player) => {
     setSearchQuery('');
-    navigate(`/${player.tekkenId}`);
+    navigate(`/player/${player.tekkenId}`);
     setShowSuggestions(false);
   };
 
@@ -41,7 +41,7 @@ const Header = () => {
     <header className={styles.header}>
       <div className={styles.headerContainer}>
         <div className={styles.headerContent}>
-          <a className={styles.logo} href="/">Tekken Stats</a>
+          <Link to="/" className={styles.logo}>Tekken Stats</Link>
           <div className={styles.headerSearchContainer}>
             <form onSubmit={handleSearch} className={styles.headerSearchForm}>
               <div className={styles.headerInputWrapper}>

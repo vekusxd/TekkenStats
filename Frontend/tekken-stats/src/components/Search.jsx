@@ -24,7 +24,7 @@ const Search = () => {
     try {
       const results = await searchPlayers(searchQuery);
       if (results.length > 0) {
-        navigate(`/${results[0].tekkenId}`);
+        navigate(`/player/${results[0].tekkenId}`);
       }
     } catch (error) {
       setInputError(error.message);
@@ -33,7 +33,7 @@ const Search = () => {
 
   const handlePlayerClick = (player) => {
     setSearchQuery(player.name);
-    navigate(`/${player.tekkenId}`);
+    navigate(`/player/${player.tekkenId}`);
     setShowSuggestions(false);
   };
 
