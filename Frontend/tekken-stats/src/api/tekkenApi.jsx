@@ -7,5 +7,5 @@ export const tekkenApi = {
     fetchMatchups: (playerId, params) => axios.get(`${BASE_URL}/api/matchups/${playerId}`, { params }),
     fetchRivals: (playerId, params) => axios.get(`${BASE_URL}/api/rivals/${playerId}`, { params }),
     fetchHeadToHead: (playerId, opponentId) => axios.get(`${BASE_URL}/api/head-to-head/${playerId}/${opponentId}`),
-    searchPlayers: (query) => axios.get(`${BASE_URL}/api/names`, { params: { StartsWith: query, Amount: 1 } })
+    searchPlayers: (query) => axios.get(`${BASE_URL}/api/names`, { params: { StartsWith: query } })
   };
